@@ -1,147 +1,244 @@
-import { ArrowUpRight, Github } from "lucide-react";
-export const Projects = () => {
-  const projects = [
-    
-    {
-      title: "eTrade – Dummy E-Commerce Frontend UI",
-      description:
-        "A dummy e-commerce frontend UI built using React and Tailwind CSS. This project focuses on creating reusable components, product layouts, and a clean responsive design similar to real-world shopping platforms.",
-      image: "/projects/eTrade.png",
-      tags: ["React", "Tailwind CSS"],
-      link: "#",
-      github: "#",
-    },
-   
-    {
-      title: "QuickAI – AI SaaS Web Application",
-      description:
-        "An AI-powered SaaS web app that provides features like content generation and smart tools using external AI APIs. Focused on building reusable components, API handling, and clean UI/UX for production-style apps.",
-      image: "/projects/AI-SaaS-App.png",
-      tags: ["React", "Node.js", "Express.js", "API Integration", "Tailwind CSS"],
-      link: "#",
-      github: "#",
-    },
-    
-    {
-      title: "Modern Developer Portfolio",
-      description:
-        "A modern and responsive personal portfolio built with React and Tailwind CSS. Designed with a data-first approach where content is defined first and UI components are generated dynamically.",
-      image: "/projects/modern-portfolio-2026.png",
-      tags: ["React", "Tailwind CSS"],
-      link: "#",
-      github: "#",
-    },
-     {
-      title: "StudyNotion – E-Learning Platform",
-      description:
-        "A full-stack e-learning platform where students can explore courses and instructors can manage content. Built to understand real-world authentication flow, role-based access, and API integration using MERN stack.",
-      image: "/projects/study-notion.png",
-      tags: ["React", "Node.js", "Express.js", "MongoDB", "Tailwind CSS"],
-      link: "#",
-      github: "#",
+// Project showcase with one kinetic marquee, observer rail, and collage cards.
+// The layout is loud, but the content stays grounded in real project records.
+import { useEffect, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
+import { profile, projects } from "@/data/portfolio";
+
+/**
+ * Tracks which project card is currently most visible.
+ * IntersectionObserver avoids manual scroll math and keeps the rail cheap.
+ */
+const useActiveProject = () => {
+  const [activeProject, setActiveProject] = useState(projects[0].id);
+  const [isRailVisible, setIsRailVisible] = useState(false);
+
+  useEffect(() => {
+    const cards = document.querySelectorAll("[data-project-card]");
+    const section = document.querySelector("#projects");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visibleEntry?.target.id) {
+          setActiveProject(visibleEntry.target.id);
+        }
+      },
+      { rootMargin: "-20% 0px -25% 0px", threshold: [0.35, 0.55, 0.75] }
+    );
+
+    const sectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        setIsRailVisible(entry.isIntersecting);
+      },
+      { threshold: 0.08 }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    if (section) {
+      sectionObserver.observe(section);
     }
 
-  ];
+    return () => {
+      observer.disconnect();
+      sectionObserver.disconnect();
+    };
+  }, []);
+
+  return { activeProject, isRailVisible };
+};
+
+/**
+ * Renders the single marquee moment requested by the direction.
+ */
+const ProjectMarquee = () => {
+  const marqueeText = projects.map((project) => project.shortTitle).join(" / ");
 
   return (
-    <section id="projects" className="section-shell py-24 md:py-36 relative overflow-hidden">
-      {/* Bg glows */}
-      <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 left-0 w-64 h-64 bg-highlight/5 rounded-full blur-3xl" />
-      <div className="container mx-auto px-5 sm:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="text-center mx-auto max-w-5xl mb-16 md:mb-20 reveal-on-scroll">
-          <span className="section-kicker animate-fade-in">Featured Work</span>
-          <h2 className="section-title mt-5 mb-6 animate-fade-in animation-delay-100"> Projects that
-            {/* {" "}--> iise ek hi line me space aata hain */}
-            {" "}
-            <span className="font-serif italic font-normal text-white">make an impact.</span>
-          </h2>
-          < p className="section-copy mx-auto animate-fade-in animation-delay-200">
-            Selected applications that show how I approach interfaces, backend
-            logic, integrations, and responsive product design.
+    <div className="overflow-hidden border-y-2 border-ink bg-ink py-5 text-paper md:py-7">
+      <div className="marquee-track gap-8 md:gap-12" aria-label={marqueeText}>
+        {[0, 1].map((copy) => (
+          <p
+            key={copy}
+            className="font-display text-[4.8rem] font-black uppercase leading-none tracking-[-0.045em] md:text-[9rem]"
+            aria-hidden={copy === 1}
+          >
+            {marqueeText} /&nbsp;
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Renders the desktop numbered rail and mobile dot rail from the same state.
+ * @param {object} props
+ * @param {string} props.activeProject - Project id currently highlighted.
+ * @param {boolean} props.isRailVisible - Keeps the fixed rail out of non-project sections.
+ */
+const ProjectRail = ({ activeProject, isRailVisible }) => {
+  return (
+    <>
+      <div
+        className={`project-rail ${
+          isRailVisible ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-label="Project index"
+      >
+        {projects.map((project) => (
+          <a
+            key={project.id}
+            href={`#${project.id}`}
+            className={`rail-button grid place-items-center ${
+              activeProject === project.id ? "is-active" : ""
+            }`}
+            aria-label={`Jump to ${project.title}`}
+          >
+            {project.number}
+          </a>
+        ))}
+      </div>
+
+      <div className="mobile-rail" aria-label="Project progress">
+        {projects.map((project) => (
+          <a
+            key={project.id}
+            href={`#${project.id}`}
+            className={`dot-button ${
+              activeProject === project.id ? "is-active" : ""
+            }`}
+            aria-label={`Jump to ${project.title}`}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
+/**
+ * Renders a single collage card. Concept entries are text slips, not fake
+ * screenshots, so every image that appears is a real local asset.
+ * @param {object} props
+ * @param {object} props.project - Project record to display.
+ */
+const ProjectCollageCard = ({ project }) => {
+  return (
+    <article
+      id={project.id}
+      data-project-card
+      className={`collage-card ${project.span} scroll-mt-24 p-4 md:p-5`}
+      style={{
+        "--tilt": project.tilt,
+        "--mobile-tilt": project.mobileTilt,
+      }}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="utility-label text-signal">
+            {project.number} / {project.status}
+          </p>
+          <h3 className="mt-2 font-display text-5xl font-black uppercase leading-[0.82] tracking-[-0.04em] md:text-7xl">
+            {project.title}
+          </h3>
+        </div>
+        <span className="pill h-10 px-3 font-mono text-xs font-bold">
+          {project.label}
+        </span>
+      </div>
+
+      {project.image ? (
+        <img
+          src={project.image}
+          alt={`${project.title} screenshot`}
+          className="mt-5 aspect-video w-full border-2 border-ink object-cover"
+        />
+      ) : (
+        <div className="mt-5 grid min-h-[15rem] place-items-center border-2 border-ink bg-band-butter p-6 text-center">
+          <p className="font-display text-5xl font-black uppercase leading-[0.86] tracking-[-0.03em]">
+            Concept slip:
+            <br />
+            compliance tracker
           </p>
         </div>
-        {/* Project Grid */}
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 md:pb-8 reveal-on-scroll">
-          {
-            projects.map(function (project, index) {
-              return <div
-                key={index}
-                // group class ka name diya hai ---> neeche group class ko hover krenge tab ye lagaya hai
-                className="group glass rounded-3xl overflow-hidden animate-fade-in md:row-span-1"
-                style={{ animationDelay: `${(index + 1) * 100}ms` }}
-              >
-                {/* Image */}
-                <div className="relative overflow-hidden  aspect-video">
-                  <img src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover  transition-transform transition-delay-700  group-hover:scale-110 duration-700"
-                  />
-                  {/* gradient images ke upar */}
-                  <div
-                    className="absolute inset-0 
-                    bg-gradient-to-t from-card via-card/50
-                    to-transparent opacity-60"
-                  />
-                  {/* Overlay Links */}
-                  {/* inset-0 ---> */}
-                  {/* duration-300 --> transition 300ms tak chalega */}
-                  <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <a
-                      href={project.link}
-                      aria-label={`View ${project.title}`}
-                      className="p-3 rounded-full glass hover:bg-primary hover:text-primary-foreground transition-all"
-                    >
-                      <ArrowUpRight className="w-5 h-5" />
-                    </a>
-                    <a
-                      href={project.github}
-                      aria-label={`View ${project.title} source code`}
-                      className="p-3 rounded-full glass hover:bg-primary hover:text-primary-foreground transition-all"
-                    >
-                      <Github className="w-5 h-5" />
-                    </a>
-                  </div>
-                  
-                </div>
+      )}
 
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                <div className="flex items-start justify-between">
-                  <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-                  <ArrowUpRight
-                    className="w-5 h-5 
-                  text-muted-foreground group-hover:text-primary
-                   group-hover:translate-x-1 
-                   group-hover:-translate-y-1 transition-all"
-                  />
-                </div>
+      <div className="mt-5 grid gap-4 md:grid-cols-[0.9fr_1fr]">
+        <div>
+          <p className="utility-label">Problem</p>
+          <p className="mt-2 text-lg font-bold leading-tight">{project.problem}</p>
+        </div>
+        <div>
+          <p className="utility-label">Built</p>
+          <p className="mt-2 text-base leading-snug text-muted">{project.built}</p>
+        </div>
+      </div>
 
-                <p className="text-muted-foreground text-sm">
-                  {project.description}
-                </p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag, tagIdx) => (
-                    <span
-                      key={tagIdx}
-                      className="px-4 py-1.5 rounded-full bg-surface text-xs font-medium border border-border/50 text-muted-foreground hover:border-primary/50 hover:text-primary transition-all duration-300"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {project.tags.map((tag) => (
+          <span
+            key={tag}
+            className="border-2 border-ink px-2.5 py-1 font-mono text-[0.68rem] font-bold uppercase tracking-[0.06em]"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
 
-              </div>
-            })
-          }
+      <p className="mt-5 border-l-4 border-signal pl-3 font-mono text-xs font-bold leading-snug">
+        {project.note}
+      </p>
+    </article>
+  );
+};
 
+/**
+ * Renders the complete project area: marquee, active rail, collage grid, and
+ * utility footer.
+ */
+export const Projects = () => {
+  const { activeProject, isRailVisible } = useActiveProject();
+
+  return (
+    <section id="projects" className="relative border-b-2 border-ink">
+      <ProjectMarquee />
+      <ProjectRail
+        activeProject={activeProject}
+        isRailVisible={isRailVisible}
+      />
+
+      <div className="page-shell py-16 md:py-24">
+        <div className="grid gap-8 lg:grid-cols-[0.32fr_0.68fr] lg:items-end">
+          <div>
+            <p className="utility-label">Project collage / real screenshots only</p>
+            <h2 className="display-section mt-4">Work that can be inspected.</h2>
+          </div>
+          <p className="body-large">
+            Biggest card first because full-stack EdTech is most relevant for
+            the roles I’m chasing. The concept card stays honest: no screenshot
+            until there is a screenshot.
+          </p>
+        </div>
+
+        <div className="mt-14 grid auto-rows-auto grid-cols-1 gap-8 md:grid-cols-12 md:gap-9">
+          {projects.map((project) => (
+            <ProjectCollageCard key={project.id} project={project} />
+          ))}
+        </div>
+
+        <div className="mt-16 grid gap-4 border-y-2 border-ink py-5 md:grid-cols-[1fr_auto_1fr] md:items-center">
+          <p className="utility-label">Project index [ {projects.length} ]</p>
+          <span className="divider-pattern" aria-hidden="true" />
+          <a
+            href={profile.github}
+            className="utility-label inline-flex items-center gap-2 md:justify-end"
+          >
+            View all projects <ArrowUpRight size={15} />
+          </a>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

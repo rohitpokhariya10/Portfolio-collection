@@ -1,15 +1,15 @@
-export const AnimatedBorderButton = ({ children, className = "" }) => {
+// Secondary button primitive retained without animation-heavy styling.
+// The v2 direction uses flat borders and restrained hover states.
+/**
+ * Renders a secondary flat pill button with caller-provided content.
+ * @param {object} props
+ * @param {string} [props.className] - Allows section-level spacing overrides.
+ */
+export const AnimatedBorderButton = ({ children, className = "", ...props }) => {
   return (
     <button
-      className={`
-        rounded-xl border border-border bg-surface/50 px-8 py-4
-        text-lg font-semibold text-foreground shadow-lg shadow-black/10
-        transition-all duration-300 hover:-translate-y-0.5
-        hover:border-primary/60 hover:bg-primary/10 hover:text-primary
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
-        focus-visible:ring-offset-2 focus-visible:ring-offset-background
-        ${className}
-      `}
+      className={`inline-flex items-center justify-center rounded-full border-2 border-ink bg-paper px-5 py-4 font-mono text-sm font-semibold uppercase tracking-[0.08em] text-ink hover:bg-ink hover:text-paper ${className}`}
+      {...props}
     >
       {children}
     </button>

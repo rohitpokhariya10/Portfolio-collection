@@ -1,23 +1,28 @@
-import React from "react";
-
-export const Button = ({ className = "", size = "default", children, ...props }) => {
-    //Button ka default style
+// Shared editorial button primitive kept for future small actions.
+// It matches the pill-and-border system used across the portfolio.
+/**
+ * Renders a flat pill button.
+ * @param {object} props
+ * @param {"sm" | "default" | "lg"} [props.size] - Selects the compact sizing token.
+ */
+export const Button = ({
+  className = "",
+  size = "default",
+  children,
+  ...props
+}) => {
   const baseClasses =
-    "relative overflow-hidden rounded-xl font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 hover:-translate-y-0.5 shadow-lg shadow-primary/20";
+    "inline-flex items-center justify-center rounded-full border-2 border-ink bg-paper font-mono font-semibold uppercase tracking-[0.08em] text-ink hover:bg-ink hover:text-paper disabled:cursor-not-allowed disabled:opacity-55";
   const sizeClasses = {
-    sm: "px-4 py-2 text-sm",
-    default: "px-6 py-3 text-base",
-    lg: "px-8 py-4 text-lg",
+    sm: "px-3 py-2 text-xs",
+    default: "px-4 py-3 text-xs",
+    lg: "px-5 py-4 text-sm",
   };
-//Final classes banana
-//runtime me size acces in object--> sizeClasses[size]
   const classes = `${baseClasses} ${sizeClasses[size]} ${className}`;
 
   return (
     <button className={classes} {...props}>
-      <span className="relative flex items-center justify-center gap-2">
-        {children}
-      </span>
+      <span className="flex items-center justify-center gap-2">{children}</span>
     </button>
   );
 };

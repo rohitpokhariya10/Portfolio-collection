@@ -1,105 +1,85 @@
-import {
-  ArrowRight,
-  Download,
-  Github,
-  Linkedin,
-} from "lucide-react";
-import { Button } from "../Components/Button";
-import { AnimatedBorderButton } from "../Components/AnimatedBorderButton";
+// Oversized editorial hero with a real-photo collage.
+// The collage introduces the person and the work before any formal project list.
+import { ArrowUpRight, Github, Linkedin } from "lucide-react";
+import { profile, projects } from "@/data/portfolio";
 
+const heroShots = projects.filter((project) => project.image).slice(0, 3);
+
+/**
+ * Renders the first viewport: giant compressed type, one collage card, and a
+ * compact utility bar with real links.
+ */
 export const Hero = () => {
   return (
-    <section className="hero-frame relative min-h-screen flex items-center overflow-hidden">
-      <div className="absolute inset-0">
-        <img
-          src="/projects/hero-bg.jpg"
-          alt=""
-          className="w-full h-full object-cover opacity-20"
-        />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-background/35 via-background/90 to-background" />
+    <section className="relative overflow-hidden border-b-2 border-ink pb-10 pt-9 md:pb-14 md:pt-14">
+      <div className="page-shell">
+        <div className="relative min-h-[calc(100vh-8rem)]">
+          <p className="utility-label mb-4 max-w-sm">
+            Fresh CSE graduate / MERN stack / open to software development roles
+          </p>
 
-      <div className="container mx-auto px-5 sm:px-8 pt-32 pb-20 relative z-10">
-        <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-14 lg:gap-20 items-center">
-          <div>
-            <div className="animate-fade-in">
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs sm:text-sm font-medium text-primary">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                Open to software development opportunities
-              </span>
+          <h1 className="hero-name">
+            <span className="block">Rohit</span>
+            <span className="block">Pokhariya</span>
+          </h1>
+
+          <div className="hero-role-block relative grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,0.42fr)]">
+            <div>
+              <h2 className="hero-role max-w-[10ch] text-accent-periwinkle">
+                MERN builder
+              </h2>
+              <p className="body-large mt-5">
+                I build the kind of full-stack projects where the UI, API, and
+                data flow can survive a curious reviewer and a very honest demo.
+              </p>
             </div>
 
-            <p className="mt-8 text-sm sm:text-base font-semibold tracking-[0.18em] uppercase text-secondary-foreground animate-fade-in animation-delay-100">
-              MERN Stack Developer
-            </p>
-
-            <h1 className="mt-4 max-w-4xl text-5xl sm:text-6xl lg:text-7xl xl:text-[84px] font-bold leading-[1.02] tracking-tight animate-fade-in animation-delay-100">
-              From{" "}
-              <span className="whitespace-nowrap text-primary glow-text">
-                UI to API,
-              </span>
-              <br />
-              I build full-stack
-              <br />
-              web applications
-              <br />
-              <span className="font-serif italic font-normal text-white">
-                that perform.
-              </span>
-            </h1>
-
-            <p className="mt-7 max-w-2xl text-base sm:text-lg text-muted-foreground animate-fade-in animation-delay-200">
-              I&apos;m Rohit Pokhariya, a B.Tech CSE graduate focused on building
-              reliable MERN applications with clean interfaces, practical backend
-              logic, and production-minded user experiences.
-            </p>
-
-            <div className="mt-9 flex flex-col sm:flex-row sm:flex-wrap gap-4 animate-fade-in animation-delay-300">
-              <a href="#projects">
-                <Button size="lg" className="w-full sm:w-auto">
-                  View Projects <ArrowRight className="w-5 h-5" />
-                </Button>
-              </a>
-              <a
-                href="/Rohit_Pokhariya_CV.pdf"
-                download="Rohit_Pokhariya_Resume.pdf"
-              >
-                <AnimatedBorderButton className="w-full sm:w-auto flex items-center justify-center gap-2">
-                  <Download className="w-5 h-5" />
-                  Download Resume
-                </AnimatedBorderButton>
-              </a>
-            </div>
-
-            <div className="mt-8 flex items-center gap-4 animate-fade-in animation-delay-400">
-              <span className="text-sm text-muted-foreground">Connect</span>
-              <a
-                href="https://github.com/rohitpokhariya10"
-                aria-label="GitHub"
-                className="p-2.5 rounded-xl glass hover:text-primary hover:-translate-y-1"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.linkedin.com/in/rohit-singh-pokhariya-24742a220/"
-                aria-label="LinkedIn"
-                className="p-2.5 rounded-xl glass hover:text-primary hover:-translate-y-1"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
+            <div className="relative mx-auto w-full max-w-[30rem] rotate-[5deg] border-2 border-ink bg-paper p-3 shadow-[0_24px_55px_rgba(20,20,20,0.26)] md:-mt-24 lg:mx-0">
+              <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
+                <img
+                  src={profile.photo}
+                  alt={profile.name}
+                  className="h-full min-h-[19rem] w-full border-2 border-ink object-cover"
+                />
+                <div className="grid gap-3">
+                  {heroShots.map((project) => (
+                    <img
+                      key={project.id}
+                      src={project.image}
+                      alt={`${project.title} screenshot`}
+                      className="h-24 w-full border-2 border-ink object-cover sm:h-28"
+                    />
+                  ))}
+                </div>
+              </div>
+              <p className="hand-note absolute -bottom-8 left-4 max-w-[16rem] rotate-[-8deg] text-signal">
+                Teaching by day, debugging my own ambition over a Diet Coke.
+              </p>
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md animate-fade-in animation-delay-200">
-            <div className="absolute inset-4 rounded-[2rem] bg-primary/20 blur-3xl" />
-            <div className="relative glass rounded-[2rem] p-3 glow-border">
-              <img
-                src="/projects/profile-photo.jpg"
-                alt="Rohit Pokhariya"
-                className="w-full rounded-[1.4rem] object-cover"
-              />
+          <div className="mt-20 grid gap-3 border-y-2 border-ink py-4 md:grid-cols-3 md:items-center md:gap-6">
+            <p className="utility-label">01 / Actual photo + actual projects</p>
+            <div className="flex flex-wrap gap-4 md:justify-center">
+              <a
+                href={profile.github}
+                className="utility-label inline-flex items-center gap-2 underline decoration-ink decoration-2 underline-offset-4 hover:text-signal"
+              >
+                GitHub <Github size={15} />
+              </a>
+              <a
+                href={profile.linkedin}
+                className="utility-label inline-flex items-center gap-2 underline decoration-ink decoration-2 underline-offset-4 hover:text-signal"
+              >
+                LinkedIn <Linkedin size={15} />
+              </a>
             </div>
-
+            <a
+              href="#projects"
+              className="utility-label inline-flex items-center gap-2 md:justify-end"
+            >
+              {profile.role} <ArrowUpRight size={15} />
+            </a>
           </div>
         </div>
       </div>

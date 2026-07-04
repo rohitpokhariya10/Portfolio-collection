@@ -1,93 +1,63 @@
-import { BriefcaseBusiness, CheckCircle2, GraduationCap } from "lucide-react";
-
-const experiencePoints = [
-  "Built responsive frontend interfaces with React and Tailwind CSS.",
-  "Worked with Node.js, Express.js, MongoDB, and REST API integrations.",
-  "Focused on reusable components, maintainable code, and practical UX.",
-];
-
-const educationPoints = [
-  "Bachelor of Technology in Computer Science and Engineering.",
-  "Strong foundation in programming, problem-solving, and web development.",
-  "Continuously learning modern full-stack tools and deployment workflows.",
-];
-
-const journey = [
+// Experience records for teaching, project practice, and education.
+// This keeps the portfolio grounded after the louder collage sections.
+const entries = [
   {
-    icon: BriefcaseBusiness,
-    label: "Experience",
-    title: "Project-Based MERN Development",
-    subtitle: "Hands-on full-stack application building",
-    description:
-      "Applied modern web development skills through end-to-end projects, from interface design to backend integration and deployment.",
-    points: experiencePoints,
+    number: "01",
+    label: "BrightChamps",
+    title: "Coding Instructor",
+    detail:
+      "I teach Scratch, HTML, CSS, and JavaScript across grades 1-12, then review student work closely enough to know where the confusion usually hides.",
   },
   {
-    icon: GraduationCap,
+    number: "02",
+    label: "Project practice",
+    title: "MERN development",
+    detail:
+      "I build React interfaces, REST API flows, Node/Express backends, MongoDB data models, and deployable project structures.",
+  },
+  {
+    number: "03",
     label: "Education",
-    title: "B.Tech in Computer Science & Engineering",
-    subtitle: "Computer Science graduate",
-    description:
-      "Built a technical foundation in software development and strengthened it through practical MERN stack projects.",
-    points: educationPoints,
+    title: "B.Tech CSE graduate",
+    detail:
+      "Computer science gave me the base; the projects gave me the practical habit of shipping, checking, and improving.",
   },
 ];
 
+/**
+ * Renders experience as numbered editorial records instead of a resume block.
+ */
 export const ProfessionalJourney = () => {
   return (
-    <section
-      id="experience"
-      className="section-shell relative overflow-hidden py-24 md:py-36"
-    >
-      <div className="container mx-auto px-5 sm:px-8">
-        <div className="max-w-4xl reveal-on-scroll">
-          <span className="section-kicker">Professional Journey</span>
-          <h2 className="section-title mt-5">
-            Learning by{" "}
-            <span className="font-serif italic font-normal text-white">
-              building.
-            </span>
-          </h2>
-          <p className="section-copy mt-6">
-            A practical development journey grounded in computer science and
-            shaped by building complete web applications.
+    <section id="experience" className="border-b-2 border-ink py-16 md:py-24">
+      <div className="page-shell">
+        <div className="grid gap-8 lg:grid-cols-[0.4fr_0.6fr] lg:items-end">
+          <div>
+            <p className="utility-label">Experience / marked up by real work</p>
+            <h2 className="display-section mt-4 max-w-[8ch]">
+              Build it. Teach it. Fix it.
+            </h2>
+          </div>
+          <p className="body-large">
+            My week is split between explaining code to students and building
+            projects that force the same clarity back onto my own work.
           </p>
         </div>
 
-        <div className="mt-12 grid lg:grid-cols-2 gap-5 sm:gap-6 reveal-on-scroll">
-          {journey.map((item) => (
+        <div className="mt-12 grid border-2 border-ink md:grid-cols-3">
+          {entries.map((entry) => (
             <article
-              key={item.label}
-              className="glass rounded-3xl p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40"
+              key={entry.number}
+              className="border-b-2 border-ink p-5 last:border-b-0 md:border-b-0 md:border-r-2 md:last:border-r-0"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex w-12 h-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <item.icon className="w-6 h-6" />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                  {item.label}
-                </span>
-              </div>
-
-              <h3 className="mt-6 text-2xl sm:text-3xl font-bold tracking-[-0.04em]">
-                {item.title}
+              <p className="utility-label text-signal">{entry.number}</p>
+              <p className="utility-label mt-8">{entry.label}</p>
+              <h3 className="mt-3 font-display text-6xl font-black uppercase leading-[0.82] tracking-[-0.04em]">
+                {entry.title}
               </h3>
-              <p className="mt-2 text-sm font-medium text-secondary-foreground">
-                {item.subtitle}
+              <p className="mt-5 text-lg font-bold leading-tight text-muted">
+                {entry.detail}
               </p>
-              <p className="mt-5 text-muted-foreground">{item.description}</p>
-
-              <ul className="mt-6 space-y-3">
-                {item.points.map((point) => (
-                  <li
-                    key={point}
-                    className="flex items-start gap-3 text-sm text-muted-foreground"
-                  >
-                    <CheckCircle2 className="mt-0.5 w-4 h-4 shrink-0 text-primary" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
             </article>
           ))}
         </div>

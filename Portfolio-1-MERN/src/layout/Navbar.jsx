@@ -1,117 +1,82 @@
-import { Menu, X } from "lucide-react"
-import { Button } from "../Components/Button"
-import { useEffect, useState } from "react"
+// Sticky navigation for the editorial portfolio shell.
+// It keeps the top chrome compact so the oversized hero type can do the talking.
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import { profile } from "@/data/portfolio";
 
+const navLinks = [
+  { href: "/#about", label: "About" },
+  { href: "/#projects", label: "Projects" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#experience", label: "Experience" },
+  { href: "/contact", label: "Contact" },
+];
 
-
+/**
+ * Renders the sticky nav and a small mobile menu without scroll listeners.
+ */
 export const Navbar = () => {
-  const [isMobileMenu, setIsMobileMenu] = useState(false)
-  const navLinks = [
-    { href: "#about", label: "About" },
-    { href: "#skills", label: "Skills" },
-    { href: "#projects", label: "Projects" },
-    { href: "#experience", label: "Journey" },
-  ]
-  // Navbar ---> condition rendering
-  const [isScrolled, setIsScrolled] = useState(false);
-  useEffect(() => {
-    function handleScroll() {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    }
-    window.addEventListener("scroll", handleScroll)
-
-    // cleanup function: scroll event ko hata deta hai
-    // taaki component remove hone ke baad bhi event na chale
-    //useEffecta() ka hi syntax hai
-    return function () {
-      window.removeEventListener("scroll", handleScroll)
-    }
-
-  }, [])
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 transition-all duration-500 ${isScrolled ? "glass-strong py-2" : "bg-transparent py-4"} z-99 `}>
-      <nav className="container mx-auto text-xl font-bold tracking-tight flex items-center justify-between px-5 sm:px-8">
+    <header className="sticky top-0 z-50 border-b-2 border-ink bg-paper">
+      <nav className="page-shell grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 py-3">
         <a
-          href="#"
-          className="text-xl  font-bold tracking-tight hover:text-primary"
+          href="/"
+          className="h-11 w-11 overflow-hidden rounded-2xl border-2 border-ink bg-ink"
+          aria-label={`${profile.name} home`}
         >
-          RP <span className="text-primary">.</span>
+          <img
+            src={profile.logo}
+            alt=""
+            className="h-full w-full object-cover"
+          />
         </a>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1 py-2">
-
-          <div className="glass rounded-xl px-2 py-2 items-center gap-1">
-            {/* anchor tag se reloa dnhi hoga kyunki hum single page me hi move kar rhe hai na ki new page open horha hai */}
-            {
-              navLinks.map(function (link, index) {
-                return <a href={link.href} key={index} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground  rounded-full hover:bg-surface">
-                  {link.label}
-                </a>
-
-              })
-            }
-          </div>
-        </div>
-        <div className="hidden md:block">
-          <Button size="sm" >
-            {/* redirect to contact page */}
-            <a href="#contact">Contact Me </a>
-          </Button>
-        </div>
-        {/* Moblile menu Button */}
-        <button className="md:hidden p-2 rounded-full glass text-foreground"
-          onClick={() => {
-            setIsMobileMenu(!isMobileMenu)
-          }}
+        <a
+          href={profile.resume}
+          className="pill h-10 px-5 font-mono text-xs font-bold uppercase tracking-[0.12em] hover:bg-ink hover:text-paper"
         >
-          {isMobileMenu ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          Resume
+        </a>
 
-
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="pill relative h-10 gap-2 px-2.5 pr-4 font-mono text-xs font-bold uppercase tracking-[0.08em] hover:bg-ink hover:text-paper"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+          >
+            <span className="relative h-7 w-7 overflow-hidden rounded-full border-2 border-current bg-paper">
+              <img
+                src={profile.photo}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </span>
+            <span className="hidden sm:inline">Menu</span>
+            {isMobileMenuOpen ? <X size={15} /> : <Menu size={15} />}
+          </button>
+        </div>
       </nav>
 
-      {/* Mobile Menu */}
-      {isMobileMenu && <div className="md:hidden glass-strong animate-fade-in ">
-        <div className="container flex flex-col gap-4 mx-auto px-6 py-6">
-          {
-            navLinks.map(function (link, index) {
-              return <a href={link.href} key={index}
-                className="text-xl text-muted-foreground  hover:text-foreground py-2 "
-                onClick={() => {
-                  //Navbar me se kisi bhi section me click krne se Navbar close krdo
-                  setIsMobileMenu(false)
-                }}
+      {isMobileMenuOpen && (
+        <div className="border-t-2 border-ink bg-paper">
+          <div className="page-shell grid gap-2 py-4 sm:grid-cols-5">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="pill px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] hover:bg-ink hover:text-paper"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
               </a>
-
-            })
-          }
-          <a
-            href="#contact"
-            onClick={() => setIsMobileMenu(false)}
-            className="w-full"
-          >
-            <Button >Contact Me</Button>
-          </a>
-
-
+            ))}
+          </div>
         </div>
-
-      </div>}
-
-
-
-
-
-
+      )}
     </header>
-
-  )
-}
+  );
+};
