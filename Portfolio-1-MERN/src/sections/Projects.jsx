@@ -129,7 +129,7 @@ const ProjectCollageCard = ({ project }) => {
     <article
       id={project.id}
       data-project-card
-      className={`collage-card ${project.span} scroll-mt-24 p-4 md:p-5`}
+      className="collage-card h-full scroll-mt-24 p-4 md:p-5"
       style={{
         "--tilt": project.tilt,
         "--mobile-tilt": project.mobileTilt,
@@ -211,11 +211,11 @@ export const Projects = () => {
 
       <div className="page-shell py-16 md:py-24">
         <div className="grid gap-8 lg:grid-cols-[0.32fr_0.68fr] lg:items-end">
-          <div>
-            <p className="utility-label">Project collage / real screenshots only</p>
-            <h2 className="display-section mt-4">Work that can be inspected.</h2>
-          </div>
-          <p className="body-large">
+        <div data-reveal>
+          <p className="utility-label">Project collage / real screenshots only</p>
+          <h2 className="display-section mt-4">Work that can be inspected.</h2>
+        </div>
+          <p className="body-large" data-reveal style={{ "--reveal-delay": "90ms" }}>
             Biggest card first because full-stack EdTech is most relevant for
             the roles I’m chasing. The concept card stays honest: no screenshot
             until there is a screenshot.
@@ -223,17 +223,27 @@ export const Projects = () => {
         </div>
 
         <div className="mt-14 grid auto-rows-auto grid-cols-1 gap-8 md:grid-cols-12 md:gap-9">
-          {projects.map((project) => (
-            <ProjectCollageCard key={project.id} project={project} />
+          {projects.map((project, index) => (
+            <div
+              key={project.id}
+              className={project.span}
+              data-reveal="scale"
+              style={{ "--reveal-delay": `${index * 80}ms` }}
+            >
+              <ProjectCollageCard project={project} />
+            </div>
           ))}
         </div>
 
-        <div className="mt-16 grid gap-4 border-y-2 border-ink py-5 md:grid-cols-[1fr_auto_1fr] md:items-center">
+        <div
+          className="mt-16 grid gap-4 border-y-2 border-ink py-5 md:grid-cols-[1fr_auto_1fr] md:items-center"
+          data-reveal
+        >
           <p className="utility-label">Project index [ {projects.length} ]</p>
           <span className="divider-pattern" aria-hidden="true" />
           <a
             href={profile.github}
-            className="utility-label inline-flex items-center gap-2 md:justify-end"
+            className="utility-label inline-flex items-center gap-2 hover:-translate-y-0.5 hover:text-signal md:justify-end"
           >
             View all projects <ArrowUpRight size={15} />
           </a>

@@ -32,23 +32,25 @@ export const ProfessionalJourney = () => {
     <section id="experience" className="border-b-2 border-ink py-16 md:py-24">
       <div className="page-shell">
         <div className="grid gap-8 lg:grid-cols-[0.4fr_0.6fr] lg:items-end">
-          <div>
+          <div data-reveal>
             <p className="utility-label">Experience / marked up by real work</p>
             <h2 className="display-section mt-4 max-w-[8ch]">
               Build it. Teach it. Fix it.
             </h2>
           </div>
-          <p className="body-large">
+          <p className="body-large" data-reveal style={{ "--reveal-delay": "90ms" }}>
             My week is split between explaining code to students and building
             projects that force the same clarity back onto my own work.
           </p>
         </div>
 
         <div className="mt-12 grid border-2 border-ink md:grid-cols-3">
-          {entries.map((entry) => (
+          {entries.map((entry, index) => (
             <article
               key={entry.number}
-              className="border-b-2 border-ink p-5 last:border-b-0 md:border-b-0 md:border-r-2 md:last:border-r-0"
+              className="border-b-2 border-ink p-5 transition-colors duration-200 hover:bg-accent-mint last:border-b-0 md:border-b-0 md:border-r-2 md:last:border-r-0"
+              data-reveal
+              style={{ "--reveal-delay": `${index * 80}ms` }}
             >
               <p className="utility-label text-signal">{entry.number}</p>
               <p className="utility-label mt-8">{entry.label}</p>

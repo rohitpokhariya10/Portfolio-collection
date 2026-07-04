@@ -8,13 +8,13 @@ import { capabilities } from "@/data/portfolio";
 export const Skills = () => {
   return (
     <section id="skills" className="border-b-2 border-ink">
-      {capabilities.map((capability) => (
+      {capabilities.map((capability, index) => (
         <article
           key={capability.title}
           className={`${capability.colorClass} relative overflow-hidden border-b-2 border-ink py-14 last:border-b-0 md:py-20`}
         >
           <div className="page-shell grid gap-8 md:grid-cols-[minmax(0,0.68fr)_minmax(18rem,0.32fr)] md:items-center">
-            <div>
+            <div data-reveal style={{ "--reveal-delay": `${index * 70}ms` }}>
               <p className="utility-label">Capability band</p>
               <h2 className="display-band mt-3 max-w-[9ch]">
                 {capability.title}
@@ -24,18 +24,23 @@ export const Skills = () => {
               </p>
             </div>
 
-            <aside
-              className={`${capability.stickerColor} clip-corners relative rotate-3 border-2 border-ink p-4 shadow-[8px_8px_0_var(--color-ink)] md:-mr-8 md:-mt-14`}
+            <div
+              data-reveal="scale"
+              style={{ "--reveal-delay": `${index * 70 + 120}ms` }}
             >
-              <img
-                src={capability.stickerImage}
-                alt=""
-                className="aspect-[4/3] w-full border-2 border-ink object-cover"
-              />
-              <p className="mt-4 font-mono text-xs font-bold leading-snug">
-                {capability.sticker}
-              </p>
-            </aside>
+              <aside
+                className={`${capability.stickerColor} clip-corners relative rotate-3 border-2 border-ink p-4 shadow-[8px_8px_0_var(--color-ink)] transition-transform duration-200 hover:rotate-0 md:-mr-8 md:-mt-14`}
+              >
+                <img
+                  src={capability.stickerImage}
+                  alt=""
+                  className="aspect-[4/3] w-full border-2 border-ink object-cover"
+                />
+                <p className="mt-4 font-mono text-xs font-bold leading-snug">
+                  {capability.sticker}
+                </p>
+              </aside>
+            </div>
           </div>
         </article>
       ))}

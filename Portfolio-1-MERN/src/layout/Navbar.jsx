@@ -23,7 +23,7 @@ export const Navbar = () => {
       <nav className="page-shell grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 py-3">
         <a
           href="/"
-          className="h-11 w-11 overflow-hidden rounded-2xl border-2 border-ink bg-ink"
+          className="logo-mark h-11 w-11 overflow-hidden rounded-2xl border-2 border-ink bg-ink"
           aria-label={`${profile.name} home`}
         >
           <img
@@ -35,7 +35,7 @@ export const Navbar = () => {
 
         <a
           href={profile.resume}
-          className="pill h-10 px-5 font-mono text-xs font-bold uppercase tracking-[0.12em] hover:bg-ink hover:text-paper"
+          className="pill interactive-lift h-10 px-5 font-mono text-xs font-bold uppercase tracking-[0.12em] hover:bg-ink hover:text-paper"
         >
           Resume
         </a>
@@ -43,7 +43,7 @@ export const Navbar = () => {
         <div className="flex justify-end">
           <button
             type="button"
-            className="pill relative h-10 gap-2 px-2.5 pr-4 font-mono text-xs font-bold uppercase tracking-[0.08em] hover:bg-ink hover:text-paper"
+            className="pill interactive-lift relative h-10 gap-2 px-2.5 pr-4 font-mono text-xs font-bold uppercase tracking-[0.08em] hover:bg-ink hover:text-paper"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             onClick={() => setIsMobileMenuOpen((open) => !open)}
@@ -62,13 +62,14 @@ export const Navbar = () => {
       </nav>
 
       {isMobileMenuOpen && (
-        <div className="border-t-2 border-ink bg-paper">
+        <div className="nav-menu-panel border-t-2 border-ink bg-paper">
           <div className="page-shell grid gap-2 py-4 sm:grid-cols-5">
-            {navLinks.map((link) => (
+            {navLinks.map((link, index) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="pill px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] hover:bg-ink hover:text-paper"
+                className="nav-menu-link pill interactive-lift px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] hover:bg-ink hover:text-paper"
+                style={{ "--menu-delay": `${index * 35}ms` }}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}

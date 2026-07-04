@@ -9,12 +9,15 @@ import { Contact } from "@/sections/Contact";
 import { Skills } from "@/sections/Skills";
 import { ProfessionalJourney } from "@/sections/ProfessionalJourney";
 import { Footer } from "./layout/Footer";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const getRoute = () => (window.location.pathname === "/contact" ? "contact" : "home");
 
 const App = () => {
   const [route, setRoute] = useState(getRoute);
   const isContactRoute = route === "contact";
+
+  useScrollReveal(route);
 
   useEffect(() => {
     const syncRoute = () => setRoute(getRoute());

@@ -112,7 +112,7 @@ export const Contact = () => {
   return (
     <section id="contact" className="border-b-2 border-ink bg-paper py-16 text-ink md:py-24">
       <div className="page-shell grid gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
-        <div className="motion-rise">
+        <div data-reveal>
           <p className="utility-label">Get in touch</p>
           <h2 className="display-section mt-4 max-w-[9ch]">Let's connect</h2>
           <p className="body-large mt-7">
@@ -121,27 +121,34 @@ export const Contact = () => {
           </p>
 
           <div className="mt-10 grid gap-3">
-            {contactLinks.map((item) => (
-              <a
+            {contactLinks.map((item, index) => (
+              <div
                 key={item.label}
-                href={item.href}
-                className="motion-rise group grid gap-3 border-2 border-ink bg-paper p-4 hover:bg-ink hover:text-paper sm:grid-cols-[8rem_1fr] sm:items-center"
+                data-reveal
+                style={{ "--reveal-delay": `${index * 70 + 120}ms` }}
               >
-                <span className="utility-label inline-flex items-center gap-2">
-                  <item.icon size={15} />
-                  {item.label}
-                </span>
-                <span className="break-words font-mono text-xs font-bold leading-snug">
-                  {item.value}
-                </span>
-              </a>
+                <a
+                  href={item.href}
+                  className="interactive-lift group grid gap-3 border-2 border-ink bg-paper p-4 hover:bg-ink hover:text-paper sm:grid-cols-[8rem_1fr] sm:items-center"
+                >
+                  <span className="utility-label inline-flex items-center gap-2">
+                    <item.icon size={15} />
+                    {item.label}
+                  </span>
+                  <span className="break-words font-mono text-xs font-bold leading-snug">
+                    {item.value}
+                  </span>
+                </a>
+              </div>
             ))}
           </div>
         </div>
 
         <form
-          className="motion-rise motion-delay-2 relative grid gap-4 border-2 border-ink p-3 md:p-4"
+          className="relative grid gap-4 border-2 border-ink p-3 md:p-4"
+          data-reveal="scale"
           style={{
+            "--reveal-delay": "120ms",
             backgroundImage:
               "repeating-linear-gradient(135deg, var(--color-band-coral) 0 12px, var(--color-band-butter) 12px 24px)",
           }}
@@ -173,7 +180,7 @@ export const Contact = () => {
                 autoComplete="given-name"
                 value={form.firstName}
                 onChange={handleChange}
-                className="border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
               />
             </label>
 
@@ -186,7 +193,7 @@ export const Contact = () => {
                 autoComplete="family-name"
                 value={form.lastName}
                 onChange={handleChange}
-                className="border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
               />
             </label>
 
@@ -199,7 +206,7 @@ export const Contact = () => {
                 autoComplete="email"
                 value={form.email}
                 onChange={handleChange}
-                className="border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
               />
             </label>
 
@@ -211,7 +218,7 @@ export const Contact = () => {
                 autoComplete="tel"
                 value={form.phone}
                 onChange={handleChange}
-                className="border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
               />
             </label>
 
@@ -221,7 +228,7 @@ export const Contact = () => {
                 name="projectType"
                 value={form.projectType}
                 onChange={handleChange}
-                className="border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
               >
                 {projectTypes.map((type) => (
                   <option key={type} value={type}>
@@ -240,7 +247,7 @@ export const Contact = () => {
                 placeholder="Tell me what you're looking for..."
                 value={form.message}
                 onChange={handleChange}
-                className="resize-none border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control resize-none border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
               />
             </label>
 
@@ -248,7 +255,7 @@ export const Contact = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="pill pill-dark h-12 gap-2 px-6 font-mono text-xs font-bold uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-60"
+                className="pill pill-dark interactive-lift h-12 gap-2 px-6 font-mono text-xs font-bold uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSubmitting ? (
                   <LoaderCircle className="animate-spin" size={16} />
@@ -260,7 +267,7 @@ export const Contact = () => {
 
               {feedback && (
                 <p
-                  className={`font-mono text-xs font-bold leading-snug ${
+                  className={`form-feedback font-mono text-xs font-bold leading-snug ${
                     status === "success" ? "text-ink" : "text-signal"
                   }`}
                   role="status"
