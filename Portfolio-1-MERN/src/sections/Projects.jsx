@@ -70,6 +70,7 @@ const ProjectPanel = ({ active, index, isStacking, project }) => {
       }`}
       style={{ "--stack-z": index + 1 }}
       aria-labelledby={titleId}
+      data-cursor="hover"
       data-reveal={isStacking ? undefined : "scale"}
     >
       <div className="page-shell project-panel__inner">

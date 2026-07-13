@@ -2,6 +2,7 @@
 // The sections stay separate so each visual idea has a clear owner.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LoadingScreen } from "@/Components/LoadingScreen";
+import { CustomCursor } from "@/Components/CustomCursor";
 import { Navbar } from "@/layout/Navbar";
 import { Hero } from "@/sections/Hero";
 import { About } from "@/sections/About";
@@ -164,8 +165,11 @@ const App = () => {
 
   return (
     <>
+      <CustomCursor />
+
       {isLoading && (
         <LoadingScreen
+          preloadParticleHero={!isContactRoute}
           onExitStart={handleLoaderExitStart}
           onComplete={handleLoaderComplete}
         />
@@ -177,7 +181,7 @@ const App = () => {
         aria-hidden={isLoading}
         inert={isLoading}
       >
-        <Navbar />
+        <Navbar introGated={!isContactRoute} />
 
         <main className="route-enter" key={route}>
           {isContactRoute ? (
