@@ -1,49 +1,45 @@
-// Full-width capability bands for the portfolio's strongest proof points.
-// The flat color blocks create energy without animated skill meters.
-import { capabilities } from "@/data/portfolio";
+// Grouped skill proof instead of a flat keyword wall.
+import { skillGroups } from "@/data/portfolio";
 
-/**
- * Renders capability bands with one original sticker per band.
- */
 export const Skills = () => {
   return (
-    <section id="skills" className="border-b-2 border-ink">
-      {capabilities.map((capability, index) => (
-        <article
-          key={capability.title}
-          className={`${capability.colorClass} relative overflow-hidden border-b-2 border-ink py-14 last:border-b-0 md:py-20`}
-        >
-          <div className="page-shell grid gap-8 md:grid-cols-[minmax(0,0.68fr)_minmax(18rem,0.32fr)] md:items-center">
-            <div data-reveal style={{ "--reveal-delay": `${index * 70}ms` }}>
-              <p className="utility-label">Capability band</p>
-              <h2 className="display-band mt-3 max-w-[9ch]">
-                {capability.title}
-              </h2>
-              <p className="mt-7 max-w-3xl text-xl font-black leading-tight tracking-[-0.025em] md:text-3xl">
-                {capability.proof}
-              </p>
-            </div>
-
-            <div
-              data-reveal="scale"
-              style={{ "--reveal-delay": `${index * 70 + 120}ms` }}
-            >
-              <aside
-                className={`${capability.stickerColor} clip-corners relative rotate-3 border-2 border-ink p-4 shadow-[8px_8px_0_var(--color-ink)] transition-transform duration-200 hover:rotate-0 md:-mr-8 md:-mt-14`}
-              >
-                <img
-                  src={capability.stickerImage}
-                  alt=""
-                  className="aspect-[4/3] w-full border-2 border-ink object-cover"
-                />
-                <p className="mt-4 font-mono text-xs font-bold leading-snug">
-                  {capability.sticker}
-                </p>
-              </aside>
-            </div>
+    <section id="skills" className="section-panel border-b border-border/70">
+      <div className="page-shell">
+        <div className="section-heading-grid">
+          <div data-reveal>
+            <p className="utility-label text-accent-ink">Skills / grouped stack</p>
+            <h2 className="section-title mt-4">The stack behind the AI angle.</h2>
           </div>
-        </article>
-      ))}
+          <p
+            className="section-copy"
+            data-reveal
+            style={{ "--reveal-delay": "90ms" }}
+          >
+            Frontend, backend, data, AI integrations, and core CS fundamentals
+            organized by how they show up in production work.
+          </p>
+        </div>
+
+        <div className="skills-grid mt-12">
+          {skillGroups.map((group, index) => (
+            <article
+              key={group.title}
+              className="skill-card"
+              data-reveal
+              style={{ "--reveal-delay": `${index * 55}ms` }}
+            >
+              <p className="utility-label text-accent-ink">{group.title}</p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {group.items.map((item) => (
+                  <span key={item} className="skill-chip">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
     </section>
   );
 };

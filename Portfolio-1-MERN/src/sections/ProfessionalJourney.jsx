@@ -1,67 +1,77 @@
-// Experience records for teaching, project practice, and education.
-// This keeps the portfolio grounded after the louder collage sections.
-const entries = [
-  {
-    number: "01",
-    label: "BrightChamps",
-    title: "Coding Instructor",
-    detail:
-      "I teach Scratch, HTML, CSS, and JavaScript across grades 1-12, then review student work closely enough to know where the confusion usually hides.",
-  },
-  {
-    number: "02",
-    label: "Project practice",
-    title: "MERN development",
-    detail:
-      "I build React interfaces, REST API flows, Node/Express backends, MongoDB data models, and deployable project structures.",
-  },
-  {
-    number: "03",
-    label: "Education",
-    title: "B.Tech CSE graduate",
-    detail:
-      "Computer science gave me the base; the projects gave me the practical habit of shipping, checking, and improving.",
-  },
-];
+// Experience, education, and achievements from the attached portfolio brief.
+import { achievements, education, experience } from "@/data/portfolio";
 
-/**
- * Renders experience as numbered editorial records instead of a resume block.
- */
 export const ProfessionalJourney = () => {
   return (
-    <section id="experience" className="border-b-2 border-ink py-16 md:py-24">
+    <section id="experience" className="section-panel border-b border-border/70">
       <div className="page-shell">
-        <div className="grid gap-8 lg:grid-cols-[0.4fr_0.6fr] lg:items-end">
+        <div className="section-heading-grid">
           <div data-reveal>
-            <p className="utility-label">Experience / marked up by real work</p>
-            <h2 className="display-section mt-4 max-w-[8ch]">
-              Build it. Teach it. Fix it.
-            </h2>
+            <p className="utility-label text-accent-ink">Experience / education</p>
+            <h2 className="section-title mt-4">Professional proof beyond projects.</h2>
           </div>
-          <p className="body-large" data-reveal style={{ "--reveal-delay": "90ms" }}>
-            My week is split between explaining code to students and building
-            projects that force the same clarity back onto my own work.
+          <p
+            className="section-copy"
+            data-reveal
+            style={{ "--reveal-delay": "90ms" }}
+          >
+            Live teaching, project coordination, computer science fundamentals,
+            and shipped full-stack work all feed the same product-building habit.
           </p>
         </div>
 
-        <div className="mt-12 grid border-2 border-ink md:grid-cols-3">
-          {entries.map((entry, index) => (
-            <article
-              key={entry.number}
-              className="border-b-2 border-ink p-5 transition-colors duration-200 hover:bg-accent-mint last:border-b-0 md:border-b-0 md:border-r-2 md:last:border-r-0"
-              data-reveal
-              style={{ "--reveal-delay": `${index * 80}ms` }}
-            >
-              <p className="utility-label text-signal">{entry.number}</p>
-              <p className="utility-label mt-8">{entry.label}</p>
-              <h3 className="mt-3 font-display text-6xl font-black uppercase leading-[0.82] tracking-[-0.04em]">
-                {entry.title}
+        <div className="journey-grid mt-12">
+          <div className="grid gap-4">
+            {experience.map((entry, index) => (
+              <div
+                key={`${entry.company}-${entry.role}`}
+                className="journey-card-reveal"
+                data-reveal
+                style={{ "--reveal-delay": `${index * 80}ms` }}
+              >
+                <article className="journey-card">
+                  <p className="utility-label text-accent-ink">
+                    {entry.date} / {entry.location}
+                  </p>
+                  <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
+                    {entry.role}
+                  </h3>
+                  <p className="mt-1 utility-label text-muted">{entry.company}</p>
+                  <p className="mt-5 text-base font-semibold leading-relaxed text-muted">
+                    {entry.detail}
+                  </p>
+                </article>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="journey-card-reveal"
+            data-reveal
+            style={{ "--reveal-delay": "160ms" }}
+          >
+            <aside className="journey-card journey-card--accent">
+              <p className="utility-label">Education</p>
+              <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
+                {education.degree}
               </h3>
-              <p className="mt-5 text-lg font-bold leading-tight text-muted">
-                {entry.detail}
+              <p className="mt-2 text-base font-semibold leading-relaxed">
+                {education.school} / {education.date}
               </p>
-            </article>
-          ))}
+              <p className="mt-2 text-base font-semibold leading-relaxed">
+                {education.detail}
+              </p>
+
+              <div className="mt-8 border-t border-current/30 pt-6">
+                <p className="utility-label">Achievements</p>
+                <ul className="mt-4 grid gap-3 text-base font-black leading-snug">
+                  {achievements.map((achievement) => (
+                    <li key={achievement}>{achievement}</li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </section>

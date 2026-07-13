@@ -1,142 +1,233 @@
-// Central source for real portfolio content used across the editorial layout.
-// Keeping copy and assets here helps prevent invented projects from creeping in.
+// Central source for real portfolio content used across the portfolio.
+// Keeping facts here prevents visual components from drifting out of sync.
 
 export const profile = {
-  name: "Rohit Pokhariya",
+  name: "Rohit Singh Pokhariya",
+  shortName: "Rohit Pokhariya",
   initials: "RP",
   logo: "/logo.png",
-  role: "MERN Stack Developer",
+  role: "Full Stack AI Developer",
   location: "India",
   email: "rohit.pokhariya123@gmail.com",
-  phone: "+91 9012464329",
+  phone: "+91 90124 64329",
+  website: "https://rohitpokhariya.in",
+  websiteLabel: "rohitpokhariya.in",
   github: "https://github.com/rohitpokhariya10",
+  githubLabel: "github.com/rohitpokhariya10",
   linkedin: "https://www.linkedin.com/in/rohit-singh-pokhariya-24742a220/",
+  linkedinLabel: "rohit-singh-pokhariya-24742a220",
+  leetcode: "https://leetcode.com/u/user8310wm/",
+  leetcodeLabel: "100+ problems solved",
   resume: "/Rohit_Pokhariya_CV.pdf",
   photo: "/projects/profile-photo.jpg",
+  headline: "Full Stack AI Developer",
+  subline:
+    "MERN / PERN developer shipping production-grade web apps end to end. Currently building CrediFlow AI, an automated invoice-recovery platform for Indian MSMEs.",
+  summary:
+    "I build production-grade, AI-integrated web applications from React and Next.js interfaces through Node.js APIs, databases, queues, payments, and deployment. My current flagship build is CrediFlow AI, a B2B invoice-recovery platform for Indian MSMEs anchored in Section 43B(h) vendor-payment compliance.",
 };
 
-export const projects = [
+export const contactLinks = [
   {
-    id: "study-notion",
-    number: "01",
-    title: "StudyNotion",
-    shortTitle: "StudyNotion",
-    label: "EdTech platform",
-    status: "MERN build",
-    image: "/projects/study-notion.png",
-    problem:
-      "Students need a way to explore courses while instructors manage learning content from the same product.",
-    built:
-      "A full-stack e-learning platform built around authentication flow, role-based access, and API integration.",
-    tags: ["React", "Node.js", "Express.js", "MongoDB", "Tailwind CSS"],
-    note: "Role-based access did the heavy lifting here.",
-    span: "md:col-span-7 md:row-span-2",
-    tilt: "-3deg",
-    mobileTilt: "-1.5deg",
+    label: "Email",
+    value: profile.email,
+    href: `mailto:${profile.email}`,
   },
   {
-    id: "quick-ai",
-    number: "02",
-    title: "QuickAI",
-    shortTitle: "QuickAI",
-    label: "AI SaaS web app",
-    status: "API-backed SaaS",
-    image: "/projects/AI-SaaS-App.png",
-    problem:
-      "A production-style AI tool needs reusable UI and a clean API boundary instead of one-off prompt screens.",
-    built:
-      "An AI-powered SaaS app with content generation, external AI API handling, reusable components, and production-style UX.",
-    tags: ["React", "Node.js", "Express.js", "API Integration", "Tailwind CSS"],
-    note: "The AI bit is flashy; the boundary is the useful part.",
-    span: "md:col-span-5",
-    tilt: "4deg",
-    mobileTilt: "1deg",
+    label: "Phone",
+    value: profile.phone,
+    href: `tel:${profile.phone.replace(/\s/g, "")}`,
   },
   {
-    id: "vendor-compliance",
-    number: "03",
-    title: "Vendor Payment Compliance Tracker",
-    shortTitle: "Vendor Tracker",
-    label: "Compliance concept",
-    status: "Audit tracker concept",
-    image: null,
-    problem:
-      "Vendor payment deadlines can become hard to audit when tax-rule timing is tracked outside the workflow.",
-    built:
-      "A current product concept for tracking vendor payment deadlines against a tax rule before deadline risk turns into cleanup work.",
-    tags: ["Compliance workflow", "Deadline tracking", "Audit concept"],
-    note: "No fake screenshot. Just the actual idea, pinned like a receipt.",
-    span: "md:col-span-4",
-    tilt: "-5deg",
-    mobileTilt: "0deg",
+    label: "Website",
+    value: profile.websiteLabel,
+    href: profile.website,
   },
   {
-    id: "etrade",
-    number: "04",
-    title: "eTrade",
-    shortTitle: "eTrade",
-    label: "E-commerce frontend",
-    status: "Frontend system",
-    image: "/projects/eTrade.png",
-    problem:
-      "Shopping interfaces need repeatable product layouts that hold up across device sizes.",
-    built:
-      "A responsive e-commerce frontend focused on reusable components, product layouts, and clean shopping-platform patterns.",
-    tags: ["React", "Tailwind CSS"],
-    note: "Product cards behaved. That counts as a small victory.",
-    span: "md:col-span-4",
-    tilt: "3deg",
-    mobileTilt: "0deg",
+    label: "LinkedIn",
+    value: profile.linkedinLabel,
+    href: profile.linkedin,
   },
   {
-    id: "modern-portfolio",
-    number: "05",
-    title: "Modern Developer Portfolio",
-    shortTitle: "Portfolio",
-    label: "Content-driven UI",
-    status: "React portfolio",
-    image: "/projects/modern-portfolio-2026.png",
-    problem:
-      "Portfolio content becomes hard to maintain when layout and data are tangled together.",
-    built:
-      "A responsive personal portfolio built with a data-first approach where content is defined first and components map over it.",
-    tags: ["React", "Tailwind CSS"],
-    note: "Data first, then UI. The notes file already said it out loud.",
-    span: "md:col-span-4",
-    tilt: "-2deg",
-    mobileTilt: "0deg",
+    label: "GitHub",
+    value: profile.githubLabel,
+    href: profile.github,
+  },
+  {
+    label: "LeetCode",
+    value: profile.leetcodeLabel,
+    href: profile.leetcode,
   },
 ];
 
-export const capabilities = [
+export const skillGroups = [
   {
-    title: "MERN stack without the fog machine",
-    colorClass: "bg-band-coral",
-    stickerColor: "bg-accent-mint",
-    stickerImage: "/projects/study-notion.png",
-    proof:
-      "StudyNotion and QuickAI show React, Node.js, Express.js, MongoDB, REST APIs, and API integration in the same portfolio.",
-    sticker:
-      "Frontend, backend, and the little wiring bits that quietly decide whether the app works.",
+    title: "Languages",
+    items: ["JavaScript (ES6+)", "C++", "Java", "SQL", "HTML5", "CSS3"],
   },
   {
-    title: "Teaching makes the code easier to explain",
-    colorClass: "bg-band-butter",
-    stickerColor: "bg-accent-periwinkle text-paper",
-    stickerImage: "/projects/profile-photo.jpg",
-    proof:
-      "BrightChamps work means teaching Scratch, HTML, CSS, and JavaScript across grades 1-12, then reviewing what students submit.",
-    sticker:
-      "Daily reminder: if a kid can ask why, the code should have an answer.",
+    title: "Frontend",
+    items: [
+      "React.js",
+      "Next.js",
+      "Tailwind CSS",
+      "Responsive Design",
+      "Cross-Browser Compatibility",
+    ],
   },
   {
-    title: "Interfaces built from real content first",
-    colorClass: "bg-band-sage",
-    stickerColor: "bg-accent-mint",
-    stickerImage: "/projects/modern-portfolio-2026.png",
-    proof:
-      "The portfolio project and current repo notes both use the same habit: write the data, then map it into UI.",
-    sticker:
-      "Less mystery meat UI. More arrays doing honest work.",
+    title: "Backend",
+    items: [
+      "Node.js",
+      "Express.js",
+      "REST API Design",
+      "JWT Authentication",
+      "Google OAuth 2.0",
+      "MVC Architecture",
+    ],
   },
+  {
+    title: "Data & Caching",
+    items: ["MongoDB (Mongoose)", "PostgreSQL", "Redis"],
+  },
+  {
+    title: "AI & Integrations",
+    items: ["Google Gemini API", "Razorpay", "Cloudinary", "ImageKit"],
+  },
+  {
+    title: "Tools",
+    items: ["Git", "GitHub", "Docker", "Postman", "Vercel"],
+  },
+  {
+    title: "Core CS",
+    items: [
+      "Data Structures & Algorithms",
+      "DBMS",
+      "Operating Systems",
+      "OOP",
+      "Computer Networks",
+    ],
+  },
+];
+
+export const projects = [
+  {
+    id: "crediflow-ai",
+    number: "01",
+    title: "CrediFlow AI",
+    shortTitle: "CrediFlow",
+    label: "B2B Invoice Recovery Platform",
+    status: "Flagship AI product",
+    image: null,
+    timeline: "Current",
+    stack: [
+      "Next.js",
+      "Node.js",
+      "MongoDB",
+      "Redis",
+      "BullMQ",
+      "Socket.io",
+      "Razorpay (test mode)",
+      "Cloudinary",
+      "Docker Compose",
+    ],
+    description:
+      "A B2B SaaS platform that helps Indian MSMEs recover overdue vendor payments and stay aligned with Section 43B(h). It combines secure payment workflows, scheduled follow-ups, real-time status updates, and automated recovery-readiness scoring.",
+    highlights: [
+      "Razorpay webhook signature verification with idempotency handling",
+      "Real-time status updates through Socket.io",
+      "Token-gated buyer portal",
+      "Automated risk and recovery-readiness scoring",
+    ],
+  },
+  {
+    id: "study-notion",
+    number: "02",
+    title: "StudyNotion",
+    shortTitle: "StudyNotion",
+    label: "E-Learning Platform",
+    status: "Production full-stack app",
+    image: "/projects/study-notion.png",
+    timeline: "Mar-Aug 2025",
+    stack: [
+      "React",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Redis",
+      "Razorpay",
+      "Cloudinary",
+    ],
+    description:
+      "A MERN e-learning platform with role-based student and instructor dashboards across 10+ courses, a Redis-cached course catalog, Cloudinary-backed media uploads, and Razorpay webhook-driven enrollment.",
+    highlights: [
+      "JWT role authentication for student/instructor dashboards",
+      "Redis caching for frequently accessed course data",
+      "Razorpay webhook verification and automated enrollment",
+    ],
+  },
+  {
+    id: "arifex-ai",
+    number: "03",
+    title: "Arifex-AI",
+    shortTitle: "Arifex-AI",
+    label: "AI SaaS Platform",
+    status: "Gemini-powered SaaS",
+    image: "/projects/AI-SaaS-App.png",
+    timeline: "Sep-Dec 2024",
+    stack: [
+      "React",
+      "Node.js",
+      "Express",
+      "PostgreSQL",
+      "Gemini API",
+      "Google OAuth",
+      "ImageKit",
+    ],
+    description:
+      "A PERN SaaS platform for AI-powered text generation and resume analysis via Gemini, with Google OAuth 2.0, ImageKit-optimized media delivery, and rate-limited REST APIs backed by PostgreSQL.",
+    highlights: [
+      "AI text generation and resume analysis with Gemini API",
+      "Google OAuth 2.0 social login",
+      "Rate-limited PostgreSQL APIs with structured errors",
+    ],
+  },
+];
+
+export const experience = [
+  {
+    company: "BrightChamps",
+    role: "Freelance Coding Instructor",
+    date: "Apr 2026-Present",
+    location: "Remote",
+    detail:
+      "Delivering live coding sessions to 20+ students daily across Grade 1-12, covering Scratch, HTML/CSS/JavaScript, and web development fundamentals; designing age-appropriate, project-based curricula.",
+  },
+  {
+    company: "PayrollCloud India Pvt Ltd",
+    role: "Project Management Intern",
+    date: "Jun-Aug 2025",
+    location: "Ahmedabad",
+    detail:
+      "Coordinated planning and delivery tracking across 3 concurrent client projects, contributing to a 15% improvement in timelines. Authored 10+ process/workflow documents that reduced cross-team ambiguity.",
+  },
+];
+
+export const education = {
+  degree: "B.Tech, Computer Science Engineering",
+  school: "Graphic Era Hill University, Dehradun",
+  date: "2022-2026",
+  detail: "CGPA 7.2, graduate as of 2026.",
+};
+
+export const achievements = [
+  "100+ DSA problems solved on LeetCode.",
+  "Deployed 2 production full-stack applications with live domains.",
+];
+
+export const proofStats = [
+  ["AI product", "CrediFlow AI"],
+  ["Apps deployed", "2+"],
+  ["Courses shipped", "10+"],
+  ["DSA solved", "100+"],
 ];

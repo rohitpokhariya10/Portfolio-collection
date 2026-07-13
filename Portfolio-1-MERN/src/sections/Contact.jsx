@@ -1,49 +1,25 @@
-// Contact form section with real routes, lightweight validation, and API submit.
+// Dedicated contact page wired to the existing Vercel/Resend endpoint.
 import { useRef, useState } from "react";
-import { Github, Linkedin, LoaderCircle, Mail, Send } from "lucide-react";
+import { Linkedin, LoaderCircle, Mail, Send } from "lucide-react";
 import { profile } from "@/data/portfolio";
+
+const projectTypes = [
+  "Full-Stack Web App",
+  "AI/SaaS Product",
+  "Freelance/Contract",
+  "Other",
+];
 
 const initialForm = {
   firstName: "",
   lastName: "",
   email: "",
   phone: "",
-  projectType: "Full-time role",
+  projectType: projectTypes[0],
   message: "",
   honeypot: "",
 };
 
-const contactLinks = [
-  {
-    label: "Email",
-    value: profile.email,
-    href: `mailto:${profile.email}`,
-    icon: Mail,
-  },
-  {
-    label: "GitHub",
-    value: "github.com/rohitpokhariya10",
-    href: profile.github,
-    icon: Github,
-  },
-  {
-    label: "LinkedIn",
-    value: "rohit-singh-pokhariya-24742a220",
-    href: profile.linkedin,
-    icon: Linkedin,
-  },
-];
-
-const projectTypes = [
-  "Full-time role",
-  "Freelance project",
-  "MERN collaboration",
-  "Just saying hi",
-];
-
-/**
- * Renders a real contact form and verified contact links.
- */
 export const Contact = () => {
   const startedAt = useRef(Date.now());
   const [form, setForm] = useState(initialForm);
@@ -69,7 +45,7 @@ export const Contact = () => {
 
     if (requiredFields.some((value) => !value)) {
       setStatus("error");
-      setFeedback("Please fill in your name, email, and message.");
+      setFeedback("Please fill in your name, email, and project details.");
       return;
     }
 
@@ -88,7 +64,11 @@ export const Contact = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
           email: form.email.trim(),
+          phone: form.phone.trim(),
+          message: form.message.trim(),
           elapsedMs: Date.now() - startedAt.current,
         }),
       });
@@ -96,7 +76,7 @@ export const Contact = () => {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || "Could not send message. Please try again.");
+        throw new Error(data.error || "Could not send your message. Please try again.");
       }
 
       setForm(initialForm);
@@ -105,55 +85,70 @@ export const Contact = () => {
       setFeedback("Message sent — I'll get back to you soon.");
     } catch (error) {
       setStatus("error");
-      setFeedback(error.message || "Failed to send message, please try again.");
+      setFeedback(error.message || "Failed to send your message. Please try again.");
     }
   };
 
   return (
-    <section id="contact" className="border-b-2 border-ink bg-paper py-16 text-ink md:py-24">
-      <div className="page-shell grid gap-10 lg:grid-cols-[0.42fr_0.58fr] lg:items-start">
+    <section className="contact-page section-panel">
+      <div className="page-shell grid gap-12 lg:grid-cols-[0.42fr_0.58fr] lg:items-start lg:gap-16">
         <div data-reveal>
-          <p className="utility-label">Get in touch</p>
-          <h2 className="display-section mt-4 max-w-[9ch]">Let's connect</h2>
-          <p className="body-large mt-7">
-            Open to Software Developer and MERN stack roles where the work is
-            real, the UI matters, and the backend has to hold up.
+          <p className="utility-label text-accent-ink">Contact / collaboration</p>
+          <h1
+            id="contact-page-title"
+            className="section-title contact-page__title mt-4"
+            tabIndex={-1}
+          >
+            Let's connect
+          </h1>
+          <p className="section-copy mt-7">
+            I'm open to full-stack and AI-integrated project work and
+            collaboration. If you have an idea in mind, I'd be happy to hear
+            about it.
           </p>
 
-          <div className="mt-10 grid gap-3">
-            {contactLinks.map((item, index) => (
-              <div
-                key={item.label}
-                data-reveal
-                style={{ "--reveal-delay": `${index * 70 + 120}ms` }}
-              >
-                <a
-                  href={item.href}
-                  className="interactive-lift group grid gap-3 border-2 border-ink bg-paper p-4 hover:bg-ink hover:text-paper sm:grid-cols-[8rem_1fr] sm:items-center"
-                >
-                  <span className="utility-label inline-flex items-center gap-2">
-                    <item.icon size={15} />
-                    {item.label}
-                  </span>
-                  <span className="break-words font-mono text-xs font-bold leading-snug">
-                    {item.value}
-                  </span>
-                </a>
-              </div>
-            ))}
+          <div className="contact-channels mt-10">
+            <a href={`mailto:${profile.email}`} className="contact-channel">
+              <span className="contact-channel__icon" aria-hidden="true">
+                <Mail size={18} />
+              </span>
+              <span>
+                <span className="utility-label text-muted">Project inquiries</span>
+                <span className="contact-channel__value">{profile.email}</span>
+              </span>
+            </a>
+
+            <a href={profile.linkedin} className="contact-channel">
+              <span className="contact-channel__icon" aria-hidden="true">
+                <Linkedin size={18} />
+              </span>
+              <span>
+                <span className="utility-label text-muted">LinkedIn</span>
+                <span className="contact-channel__value">
+                  {profile.linkedinLabel}
+                </span>
+              </span>
+            </a>
           </div>
         </div>
 
         <form
-          className="relative grid gap-4 border-2 border-ink p-3 md:p-4"
+          className="contact-form relative grid gap-6"
           data-reveal="scale"
-          style={{
-            "--reveal-delay": "120ms",
-            backgroundImage:
-              "repeating-linear-gradient(135deg, var(--color-band-coral) 0 12px, var(--color-band-butter) 12px 24px)",
-          }}
+          style={{ "--reveal-delay": "120ms" }}
           onSubmit={handleSubmit}
+          aria-labelledby="contact-form-title"
+          aria-busy={isSubmitting}
         >
+          <header className="border-b border-border pb-5">
+            <h2 id="contact-form-title" className="contact-form__title">
+              Start a project
+            </h2>
+            <p className="mt-2 font-semibold leading-relaxed text-muted">
+              Tell me about your vision and let's make it reality
+            </p>
+          </header>
+
           <div
             className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
             aria-hidden="true"
@@ -170,17 +165,18 @@ export const Contact = () => {
             />
           </div>
 
-          <div className="grid gap-4 bg-paper p-4 md:grid-cols-2 md:p-5">
+          <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2">
               <span className="utility-label">First name</span>
               <input
                 name="firstName"
                 type="text"
                 required
+                maxLength={80}
                 autoComplete="given-name"
                 value={form.firstName}
                 onChange={handleChange}
-                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control"
               />
             </label>
 
@@ -190,10 +186,11 @@ export const Contact = () => {
                 name="lastName"
                 type="text"
                 required
+                maxLength={80}
                 autoComplete="family-name"
                 value={form.lastName}
                 onChange={handleChange}
-                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control"
               />
             </label>
 
@@ -203,10 +200,11 @@ export const Contact = () => {
                 name="email"
                 type="email"
                 required
+                maxLength={254}
                 autoComplete="email"
                 value={form.email}
                 onChange={handleChange}
-                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control"
               />
             </label>
 
@@ -215,20 +213,21 @@ export const Contact = () => {
               <input
                 name="phone"
                 type="tel"
+                maxLength={30}
                 autoComplete="tel"
                 value={form.phone}
                 onChange={handleChange}
-                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control"
               />
             </label>
 
             <label className="grid gap-2 md:col-span-2">
-              <span className="utility-label">Project / role type</span>
+              <span className="utility-label">Project type</span>
               <select
                 name="projectType"
                 value={form.projectType}
                 onChange={handleChange}
-                className="field-control border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control"
               >
                 {projectTypes.map((type) => (
                   <option key={type} value={type}>
@@ -239,15 +238,16 @@ export const Contact = () => {
             </label>
 
             <label className="grid gap-2 md:col-span-2">
-              <span className="utility-label">Message / details</span>
+              <span className="utility-label">Project details</span>
               <textarea
                 name="message"
                 required
-                rows={6}
-                placeholder="Tell me what you're looking for..."
+                maxLength={3000}
+                rows={7}
+                placeholder="Share the product idea, problem, or scope you have in mind."
                 value={form.message}
                 onChange={handleChange}
-                className="field-control resize-none border-2 border-ink bg-paper px-4 py-3 font-mono text-sm font-bold outline-none"
+                className="field-control resize-none"
               />
             </label>
 
@@ -255,26 +255,24 @@ export const Contact = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="pill pill-dark interactive-lift h-12 gap-2 px-6 font-mono text-xs font-bold uppercase tracking-[0.08em] disabled:cursor-not-allowed disabled:opacity-60"
+                className="striped-action contact-submit disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSubmitting ? (
-                  <LoaderCircle className="animate-spin" size={16} />
+                  <LoaderCircle className="animate-spin" size={17} />
                 ) : (
-                  <Send size={16} />
+                  <Send size={17} />
                 )}
-                {isSubmitting ? "Sending..." : "Send Message"}
+                {isSubmitting ? "Sending..." : "Send message"}
               </button>
 
-              {feedback && (
-                <p
-                  className={`form-feedback font-mono text-xs font-bold leading-snug ${
-                    status === "success" ? "text-ink" : "text-signal"
-                  }`}
-                  role="status"
-                >
-                  {feedback}
-                </p>
-              )}
+              <p
+                className={`form-feedback min-h-5 font-mono text-xs font-bold leading-snug ${
+                  status === "error" ? "text-signal" : "text-ink"
+                }`}
+                aria-live="polite"
+              >
+                {feedback}
+              </p>
             </div>
           </div>
         </form>

@@ -1,251 +1,323 @@
-// Project showcase with one kinetic marquee, observer rail, and collage cards.
-// The layout is loud, but the content stays grounded in real project records.
-import { useEffect, useState } from "react";
+// Full-width project panels that progressively enhance into a sticky stack.
+import { Fragment, useEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { profile, projects } from "@/data/portfolio";
 
-/**
- * Tracks which project card is currently most visible.
- * IntersectionObserver avoids manual scroll math and keeps the rail cheap.
- */
-const useActiveProject = () => {
-  const [activeProject, setActiveProject] = useState(projects[0].id);
-  const [isRailVisible, setIsRailVisible] = useState(false);
+const STICKY_TOP = 0;
+const LEVEL_TICKS = 4;
+const panelTones = ["cream", "sage", "coral"];
+const clampProgress = (value) => Math.min(1, Math.max(0, value));
+
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(query).matches,
+  );
 
   useEffect(() => {
-    const cards = document.querySelectorAll("[data-project-card]");
-    const section = document.querySelector("#projects");
+    const mediaQuery = window.matchMedia(query);
+    const update = () => setMatches(mediaQuery.matches);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    update();
+    mediaQuery.addEventListener("change", update);
 
-        if (visibleEntry?.target.id) {
-          setActiveProject(visibleEntry.target.id);
-        }
-      },
-      { rootMargin: "-20% 0px -25% 0px", threshold: [0.35, 0.55, 0.75] }
-    );
+    return () => mediaQuery.removeEventListener("change", update);
+  }, [query]);
 
-    const sectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        setIsRailVisible(entry.isIntersecting);
-      },
-      { threshold: 0.08 }
-    );
-
-    cards.forEach((card) => observer.observe(card));
-    if (section) {
-      sectionObserver.observe(section);
-    }
-
-    return () => {
-      observer.disconnect();
-      sectionObserver.disconnect();
-    };
-  }, []);
-
-  return { activeProject, isRailVisible };
+  return matches;
 };
 
-/**
- * Renders the single marquee moment requested by the direction.
- */
-const ProjectMarquee = () => {
-  const marqueeText = projects.map((project) => project.shortTitle).join(" / ");
+const ProjectVisual = ({ project, index }) => {
+  const rotation = index % 2 === 0 ? "-1.25deg" : "1.25deg";
 
   return (
-    <div className="overflow-hidden border-y-2 border-ink bg-ink py-5 text-paper md:py-7">
-      <div className="marquee-track gap-8 md:gap-12" aria-label={marqueeText}>
-        {[0, 1].map((copy) => (
-          <p
-            key={copy}
-            className="font-display text-[4.8rem] font-black uppercase leading-none tracking-[-0.045em] md:text-[9rem]"
-            aria-hidden={copy === 1}
-          >
-            {marqueeText} /&nbsp;
-          </p>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/**
- * Renders the desktop numbered rail and mobile dot rail from the same state.
- * @param {object} props
- * @param {string} props.activeProject - Project id currently highlighted.
- * @param {boolean} props.isRailVisible - Keeps the fixed rail out of non-project sections.
- */
-const ProjectRail = ({ activeProject, isRailVisible }) => {
-  return (
-    <>
-      <div
-        className={`project-rail ${
-          isRailVisible ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        aria-label="Project index"
-      >
-        {projects.map((project) => (
-          <a
-            key={project.id}
-            href={`#${project.id}`}
-            className={`rail-button grid place-items-center ${
-              activeProject === project.id ? "is-active" : ""
-            }`}
-            aria-label={`Jump to ${project.title}`}
-          >
-            {project.number}
-          </a>
-        ))}
-      </div>
-
-      <div className="mobile-rail" aria-label="Project progress">
-        {projects.map((project) => (
-          <a
-            key={project.id}
-            href={`#${project.id}`}
-            className={`dot-button ${
-              activeProject === project.id ? "is-active" : ""
-            }`}
-            aria-label={`Jump to ${project.title}`}
-          />
-        ))}
-      </div>
-    </>
-  );
-};
-
-/**
- * Renders a single collage card. Concept entries are text slips, not fake
- * screenshots, so every image that appears is a real local asset.
- * @param {object} props
- * @param {object} props.project - Project record to display.
- */
-const ProjectCollageCard = ({ project }) => {
-  return (
-    <article
-      id={project.id}
-      data-project-card
-      className="collage-card h-full scroll-mt-24 p-4 md:p-5"
-      style={{
-        "--tilt": project.tilt,
-        "--mobile-tilt": project.mobileTilt,
-      }}
+    <figure
+      className="project-panel__visual-frame"
+      style={{ "--visual-rotation": rotation }}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="utility-label text-signal">
-            {project.number} / {project.status}
-          </p>
-          <h3 className="mt-2 font-display text-5xl font-black uppercase leading-[0.82] tracking-[-0.04em] md:text-7xl">
-            {project.title}
-          </h3>
-        </div>
-        <span className="pill h-10 px-3 font-mono text-xs font-bold">
-          {project.label}
-        </span>
-      </div>
-
       {project.image ? (
         <img
           src={project.image}
-          alt={`${project.title} screenshot`}
-          className="mt-5 aspect-video w-full border-2 border-ink object-cover"
+          alt={`${project.title} product screenshot`}
+          className="project-panel__image"
         />
       ) : (
-        <div className="mt-5 grid min-h-[15rem] place-items-center border-2 border-ink bg-band-butter p-6 text-center">
-          <p className="font-display text-5xl font-black uppercase leading-[0.86] tracking-[-0.03em]">
-            Concept slip:
-            <br />
-            compliance tracker
-          </p>
+        <div className="project-panel__concept">
+          <p className="utility-label">System architecture</p>
+          <p className="project-panel__concept-title">AI invoice recovery</p>
+          <div className="project-panel__concept-flow" aria-hidden="true">
+            <span>Invoice</span>
+            <span>Risk</span>
+            <span>Recovery</span>
+          </div>
         </div>
       )}
 
-      <div className="mt-5 grid gap-4 md:grid-cols-[0.9fr_1fr]">
-        <div>
-          <p className="utility-label">Problem</p>
-          <p className="mt-2 text-lg font-bold leading-tight">{project.problem}</p>
-        </div>
-        <div>
-          <p className="utility-label">Built</p>
-          <p className="mt-2 text-base leading-snug text-muted">{project.built}</p>
-        </div>
-      </div>
+      <figcaption className="project-panel__visual-caption utility-label">
+        {project.image ? `${project.title} / product interface` : "CrediFlow AI / system scope"}
+      </figcaption>
+    </figure>
+  );
+};
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {project.tags.map((tag) => (
-          <span
-            key={tag}
-            className="border-2 border-ink px-2.5 py-1 font-mono text-[0.68rem] font-bold uppercase tracking-[0.06em]"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+const ProjectPanel = ({ active, index, isStacking, project }) => {
+  const titleId = `${project.id}-title`;
 
-      <p className="mt-5 border-l-4 border-signal pl-3 font-mono text-xs font-bold leading-snug">
-        {project.note}
-      </p>
+  return (
+    <article
+      className={`project-panel project-panel--${panelTones[index % panelTones.length]} ${
+        active ? "is-active" : ""
+      }`}
+      style={{ "--stack-z": index + 1 }}
+      aria-labelledby={titleId}
+      data-reveal={isStacking ? undefined : "scale"}
+    >
+      <div className="page-shell project-panel__inner">
+        <div className="project-panel__copy">
+          <div className="project-panel__meta">
+            <span className="utility-label">{project.number}</span>
+            <span className="utility-label">{project.status}</span>
+          </div>
+
+          <p className="utility-label mt-6">
+            {project.label} / {project.timeline}
+          </p>
+          <h3 id={titleId} className="project-panel__title mt-3">
+            {project.title}
+          </h3>
+          <p className="project-panel__description mt-5">
+            {project.description}
+          </p>
+
+          <div className="project-panel__stack mt-6">
+            {project.stack.map((item) => (
+              <span key={item} className="skill-chip">
+                {item}
+              </span>
+            ))}
+          </div>
+
+          <ul className="project-panel__highlights mt-6">
+            {project.highlights.map((highlight) => (
+              <li key={highlight}>{highlight}</li>
+            ))}
+          </ul>
+        </div>
+
+        <ProjectVisual project={project} index={index} />
+      </div>
     </article>
   );
 };
 
-/**
- * Renders the complete project area: marquee, active rail, collage grid, and
- * utility footer.
- */
+const ProjectRail = ({ activeIndex, activeProgress, visible }) => {
+  return (
+    <nav
+      className={`project-level-rail ${visible ? "is-visible" : ""}`}
+      aria-label="Project navigation"
+      aria-hidden={!visible}
+    >
+      <ol className="project-level-rail__levels">
+        {projects.map((project, index) => {
+          const levelProgress = index < activeIndex
+            ? 1
+            : index === activeIndex
+              ? activeProgress
+              : 0;
+
+          return (
+            <li
+              key={project.id}
+              className={`project-level-rail__level ${
+                index < activeIndex ? "is-complete" : ""
+              } ${index === activeIndex ? "is-active" : ""}`}
+            >
+              <a
+                href={`#${project.id}`}
+                className="project-level-rail__number"
+                aria-label={`Jump to ${project.title}`}
+                aria-current={activeIndex === index ? "step" : undefined}
+                tabIndex={visible ? 0 : -1}
+              >
+                {project.number}
+              </a>
+
+              {index < projects.length - 1 && (
+                <span className="project-level-rail__ladder" aria-hidden="true">
+                  {Array.from({ length: LEVEL_TICKS }, (_, tickIndex) => {
+                    const tickProgress = clampProgress(
+                      levelProgress * LEVEL_TICKS - tickIndex,
+                    );
+
+                    return (
+                      <span
+                        key={tickIndex}
+                        style={{ "--tick-progress": tickProgress.toFixed(3) }}
+                      />
+                    );
+                  })}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+};
+
 export const Projects = () => {
-  const { activeProject, isRailVisible } = useActiveProject();
+  const sectionRef = useRef(null);
+  const trackRef = useRef(null);
+  const sentinelRefs = useRef([]);
+  const reduceMotion = Boolean(useReducedMotion());
+  const showDesktopRail = useMediaQuery("(min-width: 1024px)");
+  const supportsStickyStack = useMediaQuery(
+    "(min-width: 1024px) and (min-height: 700px)",
+  );
+  const isStacking = supportsStickyStack && !reduceMotion;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeProgress, setActiveProgress] = useState(0);
+  const [sectionVisible, setSectionVisible] = useState(false);
+
+  useEffect(() => {
+    const sentinels = sentinelRefs.current.filter(Boolean);
+    let frameId = 0;
+
+    const syncActivePanel = () => {
+      const panelMetrics = sentinels
+        .map((sentinel, index) => ({
+          index,
+          top: sentinel.getBoundingClientRect().top,
+        }));
+      const reachedPanels = panelMetrics.filter(
+        (item) => item.top <= STICKY_TOP + 1,
+      );
+      const nextActiveIndex = reachedPanels.length
+        ? reachedPanels[reachedPanels.length - 1].index
+        : 0;
+      const currentTop = panelMetrics[nextActiveIndex]?.top ?? STICKY_TOP;
+      const nextTop = panelMetrics[nextActiveIndex + 1]?.top;
+      const nextProgress = nextTop === undefined
+        ? 1
+        : clampProgress(
+            (STICKY_TOP - currentTop) / Math.max(nextTop - currentTop, 1),
+          );
+
+      setActiveIndex(nextActiveIndex);
+      setActiveProgress((currentProgress) =>
+        Math.abs(currentProgress - nextProgress) > 0.002
+          ? nextProgress
+          : currentProgress,
+      );
+    };
+
+    const requestSync = () => {
+      if (frameId) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        syncActivePanel();
+        frameId = 0;
+      });
+    };
+
+    syncActivePanel();
+    window.addEventListener("scroll", requestSync, { passive: true });
+    window.addEventListener("resize", requestSync);
+
+    return () => {
+      window.removeEventListener("scroll", requestSync);
+      window.removeEventListener("resize", requestSync);
+
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+  }, [isStacking]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+
+    if (!track) {
+      return undefined;
+    }
+
+    const sectionObserver = new IntersectionObserver(
+      ([entry]) => setSectionVisible(entry.isIntersecting),
+      { rootMargin: `-${STICKY_TOP}px 0px -10% 0px`, threshold: 0 },
+    );
+
+    sectionObserver.observe(track);
+
+    return () => sectionObserver.disconnect();
+  }, []);
 
   return (
-    <section id="projects" className="relative border-b-2 border-ink">
-      <ProjectMarquee />
+    <section
+      id="projects"
+      ref={sectionRef}
+      className="section-panel project-stack-section border-b-2 border-ink"
+    >
       <ProjectRail
-        activeProject={activeProject}
-        isRailVisible={isRailVisible}
+        activeIndex={activeIndex}
+        activeProgress={activeProgress}
+        visible={showDesktopRail && sectionVisible}
       />
 
-      <div className="page-shell py-16 md:py-24">
-        <div className="grid gap-8 lg:grid-cols-[0.32fr_0.68fr] lg:items-end">
-        <div data-reveal>
-          <p className="utility-label">Project collage / real screenshots only</p>
-          <h2 className="display-section mt-4">Work that can be inspected.</h2>
-        </div>
-          <p className="body-large" data-reveal style={{ "--reveal-delay": "90ms" }}>
-            Biggest card first because full-stack EdTech is most relevant for
-            the roles I’m chasing. The concept card stays honest: no screenshot
-            until there is a screenshot.
+      <div className="page-shell">
+        <div className="section-heading-grid">
+          <div data-reveal>
+            <p className="utility-label text-signal">Work / selected project proof</p>
+            <h2 className="section-title mt-4">CrediFlow leads the stack story.</h2>
+          </div>
+
+          <p
+            className="section-copy"
+            data-reveal
+            style={{ "--reveal-delay": "90ms" }}
+          >
+            Three production-minded builds spanning AI integration,
+            authentication, payments, queues, real-time updates, caching, and
+            resilient API design.
           </p>
         </div>
+      </div>
 
-        <div className="mt-14 grid auto-rows-auto grid-cols-1 gap-8 md:grid-cols-12 md:gap-9">
-          {projects.map((project, index) => (
-            <div
-              key={project.id}
-              className={project.span}
-              data-reveal="scale"
-              style={{ "--reveal-delay": `${index * 80}ms` }}
-            >
-              <ProjectCollageCard project={project} />
-            </div>
-          ))}
-        </div>
+      <div
+        ref={trackRef}
+        className={`project-stack-track mt-12 ${
+          isStacking ? "is-stacking" : ""
+        }`}
+      >
+        {projects.map((project, index) => (
+          <Fragment key={project.id}>
+            <span
+              id={project.id}
+              className="project-panel-sentinel"
+              data-project-index={index}
+              ref={(node) => {
+                sentinelRefs.current[index] = node;
+              }}
+              aria-hidden="true"
+            />
+            <ProjectPanel
+              active={activeIndex === index}
+              index={index}
+              isStacking={isStacking}
+              project={project}
+            />
+          </Fragment>
+        ))}
+      </div>
 
-        <div
-          className="mt-16 grid gap-4 border-y-2 border-ink py-5 md:grid-cols-[1fr_auto_1fr] md:items-center"
-          data-reveal
-        >
-          <p className="utility-label">Project index [ {projects.length} ]</p>
+      <div className="page-shell">
+        <div className="section-index" data-reveal>
+          <p className="utility-label">Project records [ {projects.length} ]</p>
           <span className="divider-pattern" aria-hidden="true" />
-          <a
-            href={profile.github}
-            className="utility-label inline-flex items-center gap-2 hover:-translate-y-0.5 hover:text-signal md:justify-end"
-          >
-            View all projects <ArrowUpRight size={15} />
+          <a href={profile.github} className="inline-link">
+            View GitHub <ArrowUpRight size={15} />
           </a>
         </div>
       </div>

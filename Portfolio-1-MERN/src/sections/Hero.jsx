@@ -1,98 +1,113 @@
-// Oversized editorial hero with a real-photo collage.
-// The collage introduces the person and the work before any formal project list.
-import { ArrowUpRight, Github, Linkedin } from "lucide-react";
-import { profile, projects } from "@/data/portfolio";
+// Motion-forward hero led by the Full Stack AI Developer identity.
+import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
+import { ParticleText } from "@/Components/ParticleText";
+import { profile, proofStats } from "@/data/portfolio";
 
-const heroShots = projects.filter((project) => project.image).slice(0, 3);
-
-/**
- * Renders the first viewport: giant compressed type, one collage card, and a
- * compact utility bar with real links.
- */
 export const Hero = () => {
   return (
-    <section className="relative overflow-hidden border-b-2 border-ink pb-10 pt-9 md:pb-14 md:pt-14">
+    <section className="hero-section relative overflow-hidden border-b border-border/70">
+      <h1 id="home-page-title" className="sr-only" tabIndex={-1}>
+        {profile.name} — {profile.role}
+      </h1>
+
+      <div className="hero-particle-stage">
+        <ParticleText text={profile.shortName} label={profile.name} />
+      </div>
+
       <div className="page-shell">
-        <div className="relative min-h-[calc(100vh-8rem)]">
-          <p
-            className="utility-label mb-4 max-w-sm"
-            data-reveal
-          >
-            Fresh CSE graduate / MERN stack / open to software development roles
-          </p>
-
-          <h1
-            className="hero-name"
-            data-reveal
-            style={{ "--reveal-delay": "80ms" }}
-          >
-            <span className="block">Rohit</span>
-            <span className="block">Pokhariya</span>
-          </h1>
-
-          <div className="hero-role-block relative grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(24rem,0.42fr)]">
-            <div data-reveal style={{ "--reveal-delay": "150ms" }}>
-              <h2 className="hero-role max-w-[10ch] text-accent-periwinkle">
-                MERN builder
-              </h2>
-              <p className="body-large mt-5">
-                I build the kind of full-stack projects where the UI, API, and
-                data flow can survive a curious reviewer and a very honest demo.
+        <div className="grid content-between gap-10 py-10 md:py-14">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.68fr)_minmax(18rem,0.32fr)] lg:items-end">
+            <div className="min-w-0">
+              <p className="utility-label text-accent-ink" data-reveal>
+                {profile.shortName} / {profile.role}
               </p>
-            </div>
 
-            <div data-reveal="scale" style={{ "--reveal-delay": "220ms" }}>
-              <div className="relative mx-auto w-full max-w-[30rem] rotate-[5deg] border-2 border-ink bg-paper p-3 shadow-[0_24px_55px_rgba(20,20,20,0.26)] md:-mt-24 lg:mx-0">
-                <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
-                  <img
-                    src={profile.photo}
-                    alt={profile.name}
-                    className="h-full min-h-[19rem] w-full border-2 border-ink object-cover"
-                  />
-                  <div className="grid gap-3">
-                    {heroShots.map((project) => (
-                      <img
-                        key={project.id}
-                        src={project.image}
-                        alt={`${project.title} screenshot`}
-                        className="h-24 w-full border-2 border-ink object-cover sm:h-28"
-                      />
-                    ))}
-                  </div>
-                </div>
-                <p className="hand-note absolute -bottom-8 left-4 max-w-[16rem] rotate-[-8deg] text-signal">
-                  Teaching by day, debugging my own ambition over a Diet Coke.
-                </p>
+              <h2
+                className="hero-role-title mt-5"
+                data-reveal="line"
+                style={{ "--reveal-delay": "80ms" }}
+              >
+                <span>Full Stack</span>
+                <span>AI Developer</span>
+              </h2>
+
+              <p
+                className="hero-subline mt-6"
+                data-reveal
+                style={{ "--reveal-delay": "160ms" }}
+              >
+                {profile.subline}
+              </p>
+
+              <div
+                className="mt-8 flex flex-wrap gap-3"
+                data-reveal
+                style={{ "--reveal-delay": "220ms" }}
+              >
+                <a
+                  href="#projects"
+                  className="action-pill action-pill--accent"
+                >
+                  View AI work <ArrowDown size={16} />
+                </a>
+                <a href="/contact" className="action-pill">
+                  Contact me <Mail size={16} />
+                </a>
               </div>
             </div>
+
+            <aside
+              className="hero-proof-panel"
+              data-reveal="scale"
+              style={{ "--reveal-delay": "260ms" }}
+            >
+              <img
+                src={profile.photo}
+                alt={profile.name}
+                className="hero-proof-panel__photo"
+              />
+              <div className="grid gap-3">
+                <p className="utility-label text-accent-ink">Now shipping</p>
+                <p className="text-2xl font-black leading-none md:text-3xl">
+                  CrediFlow AI
+                </p>
+                <p className="text-sm font-semibold leading-snug text-muted">
+                  Automated invoice recovery for Indian MSMEs with Redis,
+                  BullMQ, Socket.io, Razorpay, and AI-assisted workflows.
+                </p>
+              </div>
+            </aside>
           </div>
 
           <div
-            className="mt-20 grid gap-3 border-y-2 border-ink py-4 md:grid-cols-3 md:items-center md:gap-6"
+            className="hero-meta-grid"
             data-reveal
-            style={{ "--reveal-delay": "280ms" }}
+            style={{ "--reveal-delay": "320ms" }}
           >
-            <p className="utility-label">01 / Actual photo + actual projects</p>
-            <div className="flex flex-wrap gap-4 md:justify-center">
-              <a
-                href={profile.github}
-                className="utility-label inline-flex items-center gap-2 underline decoration-ink decoration-2 underline-offset-4 hover:-translate-y-0.5 hover:text-signal"
+            {proofStats.map(([label, value], index) => (
+              <div
+                key={label}
+                className="hero-meta-item"
+                style={{ "--meta-delay": `${index * 70}ms` }}
               >
-                GitHub <Github size={15} />
+                <p className="utility-label text-muted">{label}</p>
+                <p className="mt-2 font-display text-4xl font-black uppercase leading-none md:text-5xl">
+                  {value}
+                </p>
+              </div>
+            ))}
+
+            <div className="hero-socials">
+              <a href={profile.github} aria-label="GitHub">
+                <Github size={18} />
               </a>
-              <a
-                href={profile.linkedin}
-                className="utility-label inline-flex items-center gap-2 underline decoration-ink decoration-2 underline-offset-4 hover:-translate-y-0.5 hover:text-signal"
-              >
-                LinkedIn <Linkedin size={15} />
+              <a href={profile.linkedin} aria-label="LinkedIn">
+                <Linkedin size={18} />
+              </a>
+              <a href={profile.website} aria-label="Portfolio website">
+                <ArrowUpRight size={18} />
               </a>
             </div>
-            <a
-              href="#projects"
-              className="utility-label inline-flex items-center gap-2 hover:-translate-y-0.5 hover:text-signal md:justify-end"
-            >
-              {profile.role} <ArrowUpRight size={15} />
-            </a>
           </div>
         </div>
       </div>
