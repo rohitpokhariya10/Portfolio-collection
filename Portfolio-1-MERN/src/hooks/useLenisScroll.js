@@ -4,8 +4,12 @@ import Lenis from "lenis";
 /**
  * Adds weighted page scrolling with Lenis while respecting reduced motion.
  */
-export const useLenisScroll = () => {
+export const useLenisScroll = (enabled = true) => {
   useEffect(() => {
+    if (!enabled) {
+      return undefined;
+    }
+
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     if (reduceMotion.matches) {
@@ -37,5 +41,5 @@ export const useLenisScroll = () => {
         delete window.__lenis;
       }
     };
-  }, []);
+  }, [enabled]);
 };

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 const TEXT_CANVAS_WIDTH = 1400;
 const TEXT_CANVAS_HEIGHT = 320;
 const MAX_FONT_SIZE = 220;
-const ENTRANCE_DURATION = 2.6;
+const ENTRANCE_DURATION = 1.7;
 
 const vertexShader = /* glsl */ `
   attribute vec3 aScatter;
@@ -21,12 +21,13 @@ const vertexShader = /* glsl */ `
   uniform float uPointerStrength;
   uniform float uMouseRadius;
   uniform float uRepelStrength;
+  uniform vec3 uHighlightColor;
 
   varying vec3 vColor;
   varying float vAlpha;
 
-  float easeOutCubic(float value) {
-    return 1.0 - pow(1.0 - value, 3.0);
+  float smootherStep(float value) {
+    return value * value * value * (value * (value * 6.0 - 15.0) + 10.0);
   }
 
   void main() {
@@ -35,15 +36,15 @@ const vertexShader = /* glsl */ `
       0.0,
       1.0
     );
-    float assembled = easeOutCubic(localProgress);
-    float settled = smoothstep(0.62, 1.0, assembled);
+    float assembled = smootherStep(localProgress);
+    float settled = smoothstep(0.76, 1.0, assembled);
 
     vec3 transformed = mix(aScatter, position, assembled);
 
-    float shimmerX = sin(uTime * (0.72 + aSeed * 0.45) + aSeed * 37.0);
-    float shimmerY = cos(uTime * (0.64 + aSeed * 0.38) + aSeed * 29.0);
-    transformed.xy += vec2(shimmerX, shimmerY) * 1.25 * settled;
-    transformed.z += sin(uTime * 0.8 + aSeed * 41.0) * 2.2 * settled;
+    float driftX = sin(uTime * (0.34 + aSeed * 0.18) + aSeed * 37.0);
+    float driftY = cos(uTime * (0.3 + aSeed * 0.16) + aSeed * 29.0);
+    transformed.xy += vec2(driftX, driftY) * 0.48 * settled;
+    transformed.z += sin(uTime * 0.38 + aSeed * 41.0) * 0.9 * settled;
 
     float mouseDistance = distance(transformed.xy, uMouse.xy);
     float repel = (1.0 - smoothstep(0.0, uMouseRadius, mouseDistance))
@@ -56,7 +57,23 @@ const vertexShader = /* glsl */ `
     vec2 repelDirection = mouseDistance > 0.001
       ? normalize(transformed.xy - uMouse.xy)
       : fallbackDirection;
-    transformed.xy += repelDirection * repel * uRepelStrength;
+    transformed.xy += repelDirection
+      * repel
+      * uRepelStrength
+      * (0.72 + aSeed * 0.28);
+    transformed.z += repel * uRepelStrength * 0.55;
+
+    float scanPosition = mix(
+      -820.0,
+      820.0,
+      smoothstep(0.42, 1.0, uProgress)
+    );
+    float scan = 1.0 - smoothstep(
+      0.0,
+      105.0,
+      abs(position.x - scanPosition)
+    );
+    scan *= settled;
 
     vec4 modelViewPosition = modelViewMatrix * vec4(transformed, 1.0);
     float perspectiveScale = clamp(
@@ -66,10 +83,15 @@ const vertexShader = /* glsl */ `
     );
 
     gl_Position = projectionMatrix * modelViewPosition;
-    gl_PointSize = uPointSize * aSize * uPixelRatio * perspectiveScale;
+    gl_PointSize = uPointSize
+      * aSize
+      * uPixelRatio
+      * perspectiveScale
+      * (1.0 + scan * 0.22 + repel * 0.08);
 
-    vColor = color;
-    vAlpha = mix(0.28, 1.0, assembled);
+    vColor = mix(color, uHighlightColor, scan * 0.58);
+    float reveal = smoothstep(0.0, 0.2, localProgress);
+    vAlpha = reveal * (0.84 + aSeed * 0.16) + scan * 0.06;
   }
 `;
 
@@ -79,15 +101,14 @@ const fragmentShader = /* glsl */ `
 
   void main() {
     float distanceFromCenter = length(gl_PointCoord - vec2(0.5));
-    float glow = 1.0 - smoothstep(0.08, 0.5, distanceFromCenter);
-    float core = 1.0 - smoothstep(0.0, 0.16, distanceFromCenter);
-    float alpha = (glow * 0.72 + core * 0.28) * vAlpha;
+    float dotMask = 1.0 - smoothstep(0.34, 0.5, distanceFromCenter);
+    float alpha = dotMask * vAlpha;
 
-    if (alpha < 0.01) {
+    if (alpha < 0.012) {
       discard;
     }
 
-    gl_FragColor = vec4(vColor * (0.82 + core * 0.32), alpha);
+    gl_FragColor = vec4(vColor, alpha);
     #include <colorspace_fragment>
   }
 `;
@@ -117,14 +138,14 @@ const createRandom = (seed) => {
 
 const getDensitySettings = (width) => {
   if (width <= 480) {
-    return { tier: "mobile", step: 5, maxParticles: 4500 };
+    return { tier: "mobile", step: 5, maxParticles: 3200 };
   }
 
   if (width <= 768) {
-    return { tier: "tablet", step: 4, maxParticles: 7000 };
+    return { tier: "tablet", step: 4, maxParticles: 5500 };
   }
 
-  return { tier: "desktop", step: 3, maxParticles: 12000 };
+  return { tier: "desktop", step: 3, maxParticles: 9000 };
 };
 
 const sampleText = (text, displayWidth) => {
@@ -196,34 +217,38 @@ const createGeometry = (targets, text, THREE) => {
   const sizes = new Float32Array(particleCount);
   const colors = new Float32Array(particleCount * 3);
   const random = createRandom(hashString(`${text}-${particleCount}`));
-  const cream = new THREE.Color("#ede9df");
-  const signalRed = new THREE.Color("#e23b33");
+  const ink = new THREE.Color("#141414");
+  const mintInk = new THREE.Color("#176b4b");
 
   targets.forEach(([x, y], index) => {
     const positionIndex = index * 3;
     const seed = random();
     const angle = random() * Math.PI * 2;
-    const radius = TEXT_CANVAS_WIDTH * (0.42 + random() * 0.5);
-    const accentMix = random() > 0.92 ? 0.72 + random() * 0.2 : random() * 0.035;
+    const radius = 18 + random() * 72;
+    const accentMix = random() > 0.9 ? 0.68 + random() * 0.3 : random() * 0.045;
 
-    positions[positionIndex] = x;
-    positions[positionIndex + 1] = y;
+    positions[positionIndex] = x + (random() - 0.5) * 0.65;
+    positions[positionIndex + 1] = y + (random() - 0.5) * 0.65;
     positions[positionIndex + 2] = 0;
 
-    scatter[positionIndex] = Math.cos(angle) * radius + (random() - 0.5) * 180;
-    scatter[positionIndex + 1] = Math.sin(angle) * radius * 0.42 + (random() - 0.5) * 180;
-    scatter[positionIndex + 2] = (random() - 0.5) * 520;
+    scatter[positionIndex] = x
+      + Math.cos(angle) * radius
+      + (random() - 0.5) * 12;
+    scatter[positionIndex + 1] = y
+      + Math.sin(angle) * radius * 0.48
+      + (random() - 0.5) * 10;
+    scatter[positionIndex + 2] = (random() - 0.5) * 90;
 
     delays[index] = Math.min(
-      0.48,
-      random() * 0.34 + ((x + TEXT_CANVAS_WIDTH / 2) / TEXT_CANVAS_WIDTH) * 0.12,
+      0.24,
+      random() * 0.09 + ((x + TEXT_CANVAS_WIDTH / 2) / TEXT_CANVAS_WIDTH) * 0.13,
     );
     seeds[index] = seed;
-    sizes[index] = 0.72 + random() * 0.72;
+    sizes[index] = 0.82 + random() * 0.36;
 
-    colors[positionIndex] = cream.r + (signalRed.r - cream.r) * accentMix;
-    colors[positionIndex + 1] = cream.g + (signalRed.g - cream.g) * accentMix;
-    colors[positionIndex + 2] = cream.b + (signalRed.b - cream.b) * accentMix;
+    colors[positionIndex] = ink.r + (mintInk.r - ink.r) * accentMix;
+    colors[positionIndex + 1] = ink.g + (mintInk.g - ink.g) * accentMix;
+    colors[positionIndex + 2] = ink.b + (mintInk.b - ink.b) * accentMix;
   });
 
   const geometry = new THREE.BufferGeometry();
@@ -238,13 +263,13 @@ const createGeometry = (targets, text, THREE) => {
   return geometry;
 };
 
-export const ParticleText = ({ text, label = text }) => {
+export const ParticleText = ({ text, active = true }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
     const mount = mountRef.current;
 
-    if (!mount) {
+    if (!mount || !active) {
       return undefined;
     }
 
@@ -275,6 +300,8 @@ export const ParticleText = ({ text, label = text }) => {
     let pointerNdc;
     let raycaster;
     let pointerPlane;
+    let tiltTargetX = 0;
+    let tiltTargetY = 0;
 
     const renderScene = () => {
       if (renderer && scene && camera) {
@@ -297,7 +324,7 @@ export const ParticleText = ({ text, label = text }) => {
 
       const elapsedDelta = Math.max(0, (time - previousTime) / 1000);
       const motionDelta = Math.min(elapsedDelta, 0.05);
-      const easing = 1 - Math.exp(-motionDelta * 9);
+      const easing = 1 - Math.exp(-motionDelta * 7.5);
       previousTime = time;
       activeTime += Math.min(elapsedDelta, 0.1);
       entranceElapsed = Math.min(ENTRANCE_DURATION, entranceElapsed + elapsedDelta);
@@ -312,8 +339,29 @@ export const ParticleText = ({ text, label = text }) => {
       material.uniforms.uProgress.value = entranceElapsed / ENTRANCE_DURATION;
       material.uniforms.uMouse.value.copy(pointerCurrent);
       material.uniforms.uPointerStrength.value = pointerStrength;
+      points.rotation.x = THREE.MathUtils.lerp(
+        points.rotation.x,
+        tiltTargetX,
+        easing,
+      );
+      points.rotation.y = THREE.MathUtils.lerp(
+        points.rotation.y,
+        tiltTargetY,
+        easing,
+      );
 
       renderScene();
+
+      const interactionSettled = pointerCurrent.distanceToSquared(pointerTarget) < 0.01
+        && Math.abs(pointerStrength - pointerStrengthTarget) < 0.002
+        && Math.abs(points.rotation.x - tiltTargetX) < 0.0002
+        && Math.abs(points.rotation.y - tiltTargetY) < 0.0002;
+
+      if (entranceElapsed >= ENTRANCE_DURATION && interactionSettled) {
+        frameId = 0;
+        return;
+      }
+
       frameId = window.requestAnimationFrame(tick);
     };
 
@@ -341,7 +389,7 @@ export const ParticleText = ({ text, label = text }) => {
       const { width, height } = mount.getBoundingClientRect();
       const renderWidth = Math.max(1, Math.round(width));
       const renderHeight = Math.max(1, Math.round(height));
-      const pixelRatioCap = renderWidth <= 768 ? 1.5 : 2;
+      const pixelRatioCap = renderWidth <= 768 ? 1.25 : 1.5;
       const halfFov = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
       const nextDensityTier = getDensitySettings(renderWidth).tier;
 
@@ -375,9 +423,9 @@ export const ParticleText = ({ text, label = text }) => {
 
       material.uniforms.uCameraDistance.value = camera.position.z;
       material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
-      material.uniforms.uMouseRadius.value = 72 * worldUnitsPerPixel;
-      material.uniforms.uRepelStrength.value = 22 * worldUnitsPerPixel;
-      material.uniforms.uPointSize.value = renderWidth <= 768 ? 2.05 : 2.35;
+      material.uniforms.uMouseRadius.value = 96 * worldUnitsPerPixel;
+      material.uniforms.uRepelStrength.value = 8.5 * worldUnitsPerPixel;
+      material.uniforms.uPointSize.value = renderWidth <= 768 ? 1.85 : 2.05;
 
       if (reducedMotion || isVisible) {
         renderScene();
@@ -408,7 +456,7 @@ export const ParticleText = ({ text, label = text }) => {
     };
 
     const initialize = async () => {
-      if (initializing || initialized || destroyed) {
+      if (initializing || initialized || destroyed || reducedMotion) {
         return;
       }
 
@@ -430,7 +478,8 @@ export const ParticleText = ({ text, label = text }) => {
           fontReady,
         ]);
 
-        if (destroyed) {
+        if (destroyed || reducedMotion) {
+          mount.classList.remove("is-initializing");
           return;
         }
 
@@ -457,18 +506,19 @@ export const ParticleText = ({ text, label = text }) => {
             uTime: { value: 0 },
             uProgress: { value: reducedMotion ? 1 : 0 },
             uPixelRatio: { value: 1 },
-            uPointSize: { value: 2.35 },
+            uPointSize: { value: 2.05 },
             uCameraDistance: { value: 1 },
             uMouse: { value: new THREE.Vector3() },
             uPointerStrength: { value: 0 },
-            uMouseRadius: { value: 90 },
-            uRepelStrength: { value: 24 },
+            uMouseRadius: { value: 96 },
+            uRepelStrength: { value: 8.5 },
+            uHighlightColor: { value: new THREE.Color("#176b4b") },
           },
           vertexShader,
           fragmentShader,
           transparent: true,
           depthWrite: false,
-          blending: THREE.AdditiveBlending,
+          blending: THREE.NormalBlending,
           toneMapped: false,
         });
         points = new THREE.Points(geometry, material);
@@ -477,7 +527,6 @@ export const ParticleText = ({ text, label = text }) => {
         renderer = new THREE.WebGLRenderer({
           alpha: true,
           antialias: false,
-          powerPreference: "high-performance",
         });
         renderer.setClearColor(0x000000, 0);
         renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -522,19 +571,31 @@ export const ParticleText = ({ text, label = text }) => {
         }
 
         pointerStrengthTarget = 1;
+        tiltTargetX = -pointerNdc.y * 0.018;
+        tiltTargetY = pointerNdc.x * 0.028;
+        startLoop();
       }
     };
 
     const handlePointerLeave = () => {
       pointerStrengthTarget = 0;
+      tiltTargetX = 0;
+      tiltTargetY = 0;
+      startLoop();
     };
 
     const handleMotionChange = (event) => {
       reducedMotion = event.matches;
       pointerStrength = 0;
       pointerStrengthTarget = 0;
+      tiltTargetX = 0;
+      tiltTargetY = 0;
 
       if (!initialized) {
+        if (!reducedMotion && isVisible) {
+          initialize();
+        }
+
         return;
       }
 
@@ -567,7 +628,9 @@ export const ParticleText = ({ text, label = text }) => {
           isVisible = entry.isIntersecting;
 
           if (isVisible) {
-            initialize();
+            if (!reducedMotion) {
+              initialize();
+            }
             startLoop();
           } else {
             stopLoop();
@@ -606,14 +669,13 @@ export const ParticleText = ({ text, label = text }) => {
       mount.classList.remove("is-initializing", "is-ready");
       disposeScene();
     };
-  }, [text]);
+  }, [active, text]);
 
   return (
     <div
       ref={mountRef}
       className="particle-signature"
-      role="img"
-      aria-label={label}
+      aria-hidden="true"
     >
       <span className="particle-signature__fallback" aria-hidden="true">
         {text}

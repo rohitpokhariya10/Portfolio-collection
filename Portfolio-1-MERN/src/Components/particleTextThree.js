@@ -1,10 +1,10 @@
 // Keep the hero particle effect lazy-loaded without pulling every Three.js export into its chunk.
 export {
-  AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
   Color,
   MathUtils,
+  NormalBlending,
   PerspectiveCamera,
   Plane,
   Points,

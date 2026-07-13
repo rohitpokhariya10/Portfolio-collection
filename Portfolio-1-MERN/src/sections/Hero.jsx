@@ -3,7 +3,7 @@ import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 import { ParticleText } from "@/Components/ParticleText";
 import { profile, proofStats } from "@/data/portfolio";
 
-export const Hero = () => {
+export const Hero = ({ particleActive = true }) => {
   return (
     <section className="hero-section relative overflow-hidden border-b border-border/70">
       <h1 id="home-page-title" className="sr-only" tabIndex={-1}>
@@ -11,7 +11,14 @@ export const Hero = () => {
       </h1>
 
       <div className="hero-particle-stage">
-        <ParticleText text={profile.shortName} label={profile.name} />
+        <div className="hero-particle-stage__meta page-shell utility-label" aria-hidden="true">
+          <span>Identity / particle field</span>
+          <span className="hero-particle-stage__status">
+            <span className="hero-particle-stage__status-dot" />
+            Interactive / move cursor
+          </span>
+        </div>
+        <ParticleText text={profile.shortName} active={particleActive} />
       </div>
 
       <div className="page-shell">

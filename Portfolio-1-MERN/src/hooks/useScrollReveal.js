@@ -4,9 +4,9 @@ import { useEffect } from "react";
  * Adds a visible class to reveal-marked elements when they enter the viewport.
  * It keeps motion declarative in the markup and respects reduced-motion users.
  */
-export const useScrollReveal = (dependency) => {
+export const useScrollReveal = (dependency, enabled = true) => {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (!enabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return undefined;
     }
 
@@ -29,5 +29,5 @@ export const useScrollReveal = (dependency) => {
     elements.forEach((element) => observer.observe(element));
 
     return () => observer.disconnect();
-  }, [dependency]);
+  }, [dependency, enabled]);
 };

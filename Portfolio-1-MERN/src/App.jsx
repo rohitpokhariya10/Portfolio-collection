@@ -1,6 +1,7 @@
 // Assembles the one-page portfolio in the editorial/collage reading order.
 // The sections stay separate so each visual idea has a clear owner.
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { LoadingScreen } from "@/Components/LoadingScreen";
 import { Navbar } from "@/layout/Navbar";
 import { Hero } from "@/sections/Hero";
 import { About } from "@/sections/About";
@@ -43,13 +44,43 @@ const scrollToTarget = (target) => {
 
 const App = () => {
   const [route, setRoute] = useState(getRoute);
-  const hasMounted = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [heroAnimationReady, setHeroAnimationReady] = useState(false);
+  const skipInitialHashScrollRef = useRef(true);
   const isContactRoute = route === "contact";
 
-  useLenisScroll();
-  useScrollReveal(route);
+  useLenisScroll(!isLoading);
+  useScrollReveal(route, heroAnimationReady || !isLoading);
+
+  const handleLoaderExitStart = useCallback(() => {
+    setHeroAnimationReady(true);
+  }, []);
+
+  const handleLoaderComplete = useCallback(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      return undefined;
+    }
+
+    if (skipInitialHashScrollRef.current) {
+      skipInitialHashScrollRef.current = false;
+      return undefined;
+    }
+
     if (route !== "home" || !window.location.hash) {
       return undefined;
     }
@@ -59,15 +90,14 @@ const App = () => {
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [route]);
+  }, [isLoading, route]);
 
   useEffect(() => {
     document.title = isContactRoute
       ? "Contact | Rohit Singh Pokhariya"
       : "Rohit Singh Pokhariya | Full Stack AI Developer";
 
-    if (!hasMounted.current) {
-      hasMounted.current = true;
+    if (isLoading) {
       return undefined;
     }
 
@@ -79,7 +109,7 @@ const App = () => {
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [isContactRoute]);
+  }, [isContactRoute, isLoading]);
 
   useEffect(() => {
     const syncRoute = () => setRoute(getRoute());
@@ -133,26 +163,40 @@ const App = () => {
   }, []);
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-paper text-ink">
-      <Navbar />
+    <>
+      {isLoading && (
+        <LoadingScreen
+          onExitStart={handleLoaderExitStart}
+          onComplete={handleLoaderComplete}
+        />
+      )}
 
-      <main className="route-enter" key={route}>
-        {isContactRoute ? (
-          <Contact />
-        ) : (
-          <>
-            <Hero />
-            <About />
-            <Skills />
-            <Projects />
-            <ProfessionalJourney />
-            <ContactCta />
-          </>
-        )}
-      </main>
+      <div
+        className="min-h-screen overflow-x-clip bg-paper text-ink"
+        aria-busy={isLoading}
+        aria-hidden={isLoading}
+        inert={isLoading}
+      >
+        <Navbar />
 
-      <Footer />
-    </div>
+        <main className="route-enter" key={route}>
+          {isContactRoute ? (
+            <Contact />
+          ) : (
+            <>
+              <Hero particleActive={heroAnimationReady} />
+              <About />
+              <Skills />
+              <Projects />
+              <ProfessionalJourney />
+              <ContactCta />
+            </>
+          )}
+        </main>
+
+        <Footer />
+      </div>
+    </>
   );
 };
 
