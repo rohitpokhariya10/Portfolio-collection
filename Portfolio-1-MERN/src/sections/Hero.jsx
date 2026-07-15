@@ -1,6 +1,6 @@
 // Motion-forward hero led by the Full Stack AI Developer identity.
 import { useEffect, useRef } from "react";
-import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
 import { ParticleText } from "@/Components/ParticleText";
 import { profile, proofStats } from "@/data/portfolio";
 
@@ -171,13 +171,34 @@ export const Hero = ({ particleActive = true }) => {
               data-reveal="scale"
               style={{ "--reveal-delay": "260ms" }}
             >
-              <img
-                src={profile.photo}
-                alt={profile.name}
-                className="hero-proof-panel__photo"
-              />
+              <div
+                className="hero-proof-panel__coming-soon"
+                role="img"
+                aria-label="CrediFlow AI product preview coming soon"
+              >
+                <span
+                  className="hero-proof-panel__preview-label utility-label"
+                  aria-hidden="true"
+                >
+                  Product preview / 01
+                </span>
+                <strong
+                  className="hero-proof-panel__coming-soon-title"
+                  aria-hidden="true"
+                >
+                  <span>Coming</span>
+                  <span>Soon</span>
+                </strong>
+                <span
+                  className="hero-proof-panel__preview-meta utility-label"
+                  aria-hidden="true"
+                >
+                  <span>CrediFlow / AI</span>
+                  <span>In development</span>
+                </span>
+              </div>
               <div className="grid gap-3">
-                <p className="utility-label text-accent-ink">Now shipping</p>
+                <p className="utility-label text-accent-ink">In development</p>
                 <p className="text-2xl font-black leading-none md:text-3xl">
                   CrediFlow AI
                 </p>
@@ -213,9 +234,6 @@ export const Hero = ({ particleActive = true }) => {
               </a>
               <a href={profile.linkedin} aria-label="LinkedIn">
                 <Linkedin size={18} />
-              </a>
-              <a href={profile.website} aria-label="Portfolio website">
-                <ArrowUpRight size={18} />
               </a>
             </div>
           </div>
