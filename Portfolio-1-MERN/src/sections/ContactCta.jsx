@@ -1,7 +1,7 @@
 export const ContactCta = () => {
   return (
     <section
-      className="contact-cta-section section-panel border-b border-border/70"
+      className="contact-cta-section section-panel"
       aria-labelledby="contact-cta-title"
     >
       <div className="page-shell" data-reveal="scale">
