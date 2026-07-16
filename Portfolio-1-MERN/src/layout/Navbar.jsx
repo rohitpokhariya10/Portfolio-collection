@@ -20,6 +20,8 @@ export const Navbar = ({ introGated = false }) => {
   const [isNavHidden, setIsNavHidden] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(() => !introGated);
+  const menuButtonRef = useRef(null);
+  const menuPanelRef = useRef(null);
   const pastHeroRef = useRef(!introGated);
   const revealScrollYRef = useRef(0);
 
@@ -147,19 +149,28 @@ export const Navbar = ({ introGated = false }) => {
       return undefined;
     }
 
-    const previousOverflow = document.body.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    const focusFrameId = window.requestAnimationFrame(() => {
+      menuPanelRef.current?.querySelector("a")?.focus();
+    });
 
     const closeOnEscape = (event) => {
       if (event.key === "Escape") {
         setIsMobileMenuOpen(false);
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
       }
     };
 
     window.addEventListener("keydown", closeOnEscape);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      window.cancelAnimationFrame(focusFrameId);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
   }, [isMobileMenuOpen]);
@@ -181,7 +192,7 @@ export const Navbar = ({ introGated = false }) => {
       aria-hidden={introHidden}
       inert={introHidden}
     >
-      <nav className="page-shell grid min-h-16 grid-cols-[1fr_auto_1fr] items-center gap-3 py-3 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-5">
+      <nav className="page-shell grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-5">
         <a
           href="/"
           className="logo-mark h-11 w-11 overflow-hidden rounded-2xl border border-border bg-card"
@@ -208,13 +219,16 @@ export const Navbar = ({ introGated = false }) => {
 
         <a
           href={profile.resume}
-          className="action-pill hidden h-10 px-5 sm:inline-flex"
+          className="action-pill hidden h-10 justify-self-end px-5 sm:inline-flex"
+          target="_blank"
+          rel="noreferrer"
         >
           Resume
         </a>
 
         <div className="flex justify-end lg:hidden">
           <button
+            ref={menuButtonRef}
             type="button"
             className="action-pill relative h-10 gap-2 px-2.5 pr-4"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
@@ -254,12 +268,15 @@ export const Navbar = ({ introGated = false }) => {
             onClick={() => setIsMobileMenuOpen(false)}
           />
           <div
+            ref={menuPanelRef}
             id="mobile-navigation"
-            className={`nav-menu-panel absolute left-0 top-full w-full origin-top border-y border-border bg-background/95 shadow-[0_18px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden ${
+            className={`nav-menu-panel absolute left-0 top-full max-h-[calc(100dvh-4.75rem)] w-full origin-top overflow-y-auto overscroll-contain border-y border-border bg-background/95 shadow-[0_18px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden ${
               isMobileMenuOpen ? "is-open" : "is-closing"
             }`}
+            aria-hidden={!isMobileMenuOpen}
+            inert={!isMobileMenuOpen}
           >
-            <div className="page-shell grid gap-2 py-4 sm:grid-cols-5">
+            <div className="page-shell grid gap-2 py-4 sm:grid-cols-2 md:grid-cols-5">
               {navLinks.map((link, index) => (
                 <a
                   key={link.href}

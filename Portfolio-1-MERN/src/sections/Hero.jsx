@@ -150,7 +150,7 @@ export const Hero = ({ particleActive = true }) => {
               </p>
 
               <div
-                className="mt-8 flex flex-wrap gap-3"
+                className="hero-actions mt-8"
                 data-reveal
                 style={{ "--reveal-delay": "220ms" }}
               >

@@ -247,7 +247,7 @@ export const Contact = () => {
                 placeholder="Share the product idea, problem, or scope you have in mind."
                 value={form.message}
                 onChange={handleChange}
-                className="field-control resize-none"
+                className="field-control resize-y"
               />
             </label>
 

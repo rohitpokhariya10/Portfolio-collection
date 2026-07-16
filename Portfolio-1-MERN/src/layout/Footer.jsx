@@ -24,7 +24,10 @@ export const Footer = () => {
             © {currentYear} {profile.name} / {profile.role}
           </p>
 
-          <nav className="flex flex-wrap gap-4 md:justify-end">
+          <nav
+            className="footer-links md:justify-end"
+            aria-label="Contact and social links"
+          >
             {footerLinks.map((link) => (
               <a key={link.href} href={link.href} className="inline-link">
                 {link.label} <link.icon size={15} />
