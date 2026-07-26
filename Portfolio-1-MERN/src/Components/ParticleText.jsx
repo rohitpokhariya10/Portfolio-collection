@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+// Sampling in a fixed coordinate system keeps the point cloud stable while the
+// responsive camera reframes it for each viewport.
 const TEXT_CANVAS_WIDTH = 1400;
 const TEXT_CANVAS_HEIGHT = 320;
 const MAX_FONT_SIZE = 220;
@@ -212,6 +214,8 @@ const createRandom = (seed) => {
 };
 
 const getDensitySettings = (width) => {
+  // Particle budgets scale with available pixels to protect mobile fill-rate and
+  // avoid generating detail that cannot be perceived at compact sizes.
   if (width <= 480) {
     return { tier: "mobile", step: 5, maxParticles: 3200 };
   }
@@ -271,6 +275,8 @@ const sampleText = (text, displayWidth) => {
     return candidates;
   }
 
+  // Deterministic sampling prevents visible flicker when responsive geometry
+  // crosses a density breakpoint and the point cloud is rebuilt.
   const random = createRandom(hashString(`${displayText}-${step}`));
   const stride = candidates.length / maxParticles;
 
@@ -349,6 +355,10 @@ const createGeometry = (targets, text, THREE, displayWidth) => {
   return geometry;
 };
 
+/**
+ * Renders decorative WebGL text with a plain-text fallback. Three.js and GPU
+ * resources are acquired only while the hero is active and near the viewport.
+ */
 export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
   const mountRef = useRef(null);
 
@@ -364,6 +374,7 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
     let destroyed = false;
     let initialized = false;
     let initializing = false;
+    let contextLost = false;
     let isVisible = false;
     let reducedMotion = motionQuery.matches;
     let compactMotion = compactQuery.matches;
@@ -401,7 +412,7 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
     let tiltTargetY = 0;
 
     const renderScene = () => {
-      if (renderer && scene && camera) {
+      if (!contextLost && renderer && scene && camera) {
         renderer.render(scene, camera);
       }
     };
@@ -524,6 +535,8 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
         && interactionSettled
         && scrollSettled
       ) {
+        // Once every eased value settles, pointer or scroll input becomes the
+        // next trigger. Avoiding a perpetual idle loop saves battery and GPU time.
         frameId = 0;
         return;
       }
@@ -536,6 +549,7 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
         frameId
         || destroyed
         || !initialized
+        || contextLost
         || !isVisible
         || reducedMotion
         || document.hidden
@@ -580,11 +594,16 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
     };
 
     const resize = () => {
-      if (!initialized || !renderer || !camera || !material) {
+      if (!initialized || contextLost || !renderer || !camera || !material) {
         return;
       }
 
       const { width, height } = mount.getBoundingClientRect();
+
+      if (width <= 0 || height <= 0) {
+        return;
+      }
+
       const renderWidth = Math.max(1, Math.round(width));
       const renderHeight = Math.max(1, Math.round(height));
       const pixelRatioCap = renderWidth <= 768 ? 1.25 : 1.5;
@@ -633,6 +652,14 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
       }
     };
 
+    const handleContextLost = () => {
+      // Browsers can reclaim WebGL under memory pressure. Reveal the CSS fallback
+      // immediately instead of leaving an opaque stage with a blank canvas.
+      contextLost = true;
+      stopLoop();
+      mount.classList.remove("is-initializing", "is-ready");
+    };
+
     const disposeScene = () => {
       if (points && scene) {
         scene.remove(points);
@@ -642,6 +669,7 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
       material?.dispose();
 
       if (renderer) {
+        renderer.domElement.removeEventListener("webglcontextlost", handleContextLost);
         renderer.dispose();
         renderer.forceContextLoss?.();
         renderer.domElement.remove();
@@ -654,6 +682,7 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
       camera = undefined;
       points = undefined;
       initialized = false;
+      contextLost = false;
     };
 
     const initialize = async () => {
@@ -674,6 +703,8 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
               document.fonts.ready,
             ]).catch(() => undefined)
           : Promise.resolve();
+        // Load the renderer and display font together: Three.js stays outside the
+        // critical bundle while the sampled glyph still uses final font metrics.
         const [threeModule] = await Promise.all([
           import("./particleTextThree"),
           fontReady,
@@ -741,8 +772,10 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
         renderer.outputColorSpace = THREE.SRGBColorSpace;
         renderer.domElement.className = "particle-signature__canvas";
         renderer.domElement.setAttribute("aria-hidden", "true");
+        renderer.domElement.addEventListener("webglcontextlost", handleContextLost);
         mount.appendChild(renderer.domElement);
 
+        contextLost = false;
         initialized = true;
         entranceElapsed = reducedMotion ? ENTRANCE_DURATION : 0;
         updateScrollProgress();
@@ -765,11 +798,21 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
     };
 
     const handlePointerMove = (event) => {
-      if (!initialized || reducedMotion || event.pointerType === "touch") {
+      if (
+        !initialized
+        || contextLost
+        || reducedMotion
+        || event.pointerType === "touch"
+      ) {
         return;
       }
 
       const bounds = mount.getBoundingClientRect();
+
+      if (bounds.width <= 0 || bounds.height <= 0) {
+        return;
+      }
+
       pointerNdc.set(
         ((event.clientX - bounds.left) / bounds.width) * 2 - 1,
         -((event.clientY - bounds.top) / bounds.height) * 2 + 1,
@@ -813,15 +856,11 @@ export const ParticleText = ({ text, active = true, scrollContainerRef }) => {
       }
 
       if (reducedMotion) {
-        entranceElapsed = ENTRANCE_DURATION;
-        material.uniforms.uProgress.value = 1;
-        material.uniforms.uTime.value = 0;
-        material.uniforms.uPointerStrength.value = 0;
-        material.uniforms.uScrollProgress.value = 0;
-        material.uniforms.uTravelSpeed.value = 0;
-        applyCameraZoom();
+        // The HTML fallback carries the same identity without retaining a WebGL
+        // context after the user opts out of motion.
         stopLoop();
-        renderScene();
+        mount.classList.remove("is-initializing", "is-ready");
+        disposeScene();
         return;
       }
 

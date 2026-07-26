@@ -27,6 +27,8 @@ export const profile = {
     "I build production-grade, AI-integrated web applications from React and Next.js interfaces through Node.js APIs, databases, queues, payments, and deployment. My current flagship build is CrediFlow AI, a B2B invoice-recovery platform for Indian MSMEs anchored in Section 43B(h) vendor-payment compliance.",
 };
 
+// Derive every channel from `profile` so cards, navigation, and contact pages
+// cannot silently publish different addresses for the same person.
 export const contactLinks = [
   {
     label: "Email",
@@ -60,6 +62,8 @@ export const contactLinks = [
   },
 ];
 
+// Display order is intentional: the UI presents these groups as a learning-to-
+// production progression rather than sorting them alphabetically.
 export const skillGroups = [
   {
     title: "Languages",
@@ -110,6 +114,8 @@ export const skillGroups = [
   },
 ];
 
+// Project order is also presentation order. Stable IDs double as native anchor
+// targets for the sticky project rail, so they should not be derived from titles.
 export const projects = [
   {
     id: "crediflow-ai",
@@ -225,6 +231,7 @@ export const achievements = [
   "Deployed 2 production full-stack applications with live domains.",
 ];
 
+// Compact tuples keep stat labels and values paired when rendered in responsive grids.
 export const proofStats = [
   ["AI product", "CrediFlow AI"],
   ["Apps deployed", "2+"],

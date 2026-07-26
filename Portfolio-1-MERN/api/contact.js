@@ -1,4 +1,3 @@
-// Vercel serverless contact endpoint using Resend, with honeypot and timing checks for simple bot suppression.
 import process from "node:process";
 import { Resend } from "resend";
 
@@ -24,23 +23,32 @@ const readBody = (body) => {
 };
 
 const clean = (value) => String(value || "").trim();
+const cleanSingleLine = (value) => clean(value).replace(/\s+/g, " ");
 
+/**
+ * Accepts portfolio inquiries and forwards validated plain text via Resend.
+ * Every client field is treated as untrusted at this server boundary.
+ */
 export default async function handler(req, res) {
   if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const body = readBody(req.body);
-  const firstName = clean(body.firstName);
-  const lastName = clean(body.lastName);
+  // Names are later interpolated into an email subject, so line folding is
+  // removed even though Resend also validates header input.
+  const firstName = cleanSingleLine(body.firstName);
+  const lastName = cleanSingleLine(body.lastName);
   const email = clean(body.email);
-  const phone = clean(body.phone);
+  const phone = cleanSingleLine(body.phone);
   const projectType = clean(body.projectType);
   const message = clean(body.message);
-  const elapsedMs = Number(body.elapsedMs);
 
-  // If the hidden field is filled or the form submits too quickly, pretend it worked and send nothing.
-  if (body.honeypot || (Number.isFinite(elapsedMs) && elapsedMs < 2000)) {
+  // Return an indistinguishable success when the hidden field is populated.
+  // Timing heuristics are deliberately avoided because autofill can produce a
+  // legitimate submission faster than any dependable server-side threshold.
+  if (body.honeypot) {
     return res.status(200).json({ success: true });
   }
 
@@ -71,6 +79,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Instantiate per request so serverless invocations never depend on mutable
+    // module-level client state; the platform can still reuse the loaded module.
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { error } = await resend.emails.send({

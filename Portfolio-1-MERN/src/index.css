@@ -1,6 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Caveat:wght@600&family=Space+Mono:wght@400;700&display=swap");
 @import "tailwindcss";
 
+/* --------------------------------------------------------------------------
+   Design tokens
+   Keep the editorial palette and type families available to both authored CSS
+   and Tailwind utilities so components share one source of visual truth.
+   -------------------------------------------------------------------------- */
 @theme {
   --color-background: #EDE9DF;
   --color-foreground: #141414;
@@ -32,6 +37,8 @@
 }
 
 @layer base {
+  /* Motion timings are centralized so reduced-motion handling can disable the
+     same interaction language consistently across every component. */
   :root {
     --motion-micro: 150ms;
     --motion-standard: 300ms;
@@ -53,6 +60,8 @@
 
   html,
   body {
+    /* The supported floor is 320px. Clipping at the document boundary prevents
+       decorative shadows and rotated cards from creating a horizontal scroller. */
     min-width: 320px;
     overflow-x: clip;
     scrollbar-color: var(--color-ink) var(--color-paper);
@@ -67,6 +76,7 @@
 
   body {
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--color-paper);
     color: var(--color-foreground);
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -76,6 +86,9 @@
   }
 
   img,
+  picture,
+  video,
+  canvas,
   svg {
     display: block;
     max-width: 100%;
@@ -106,6 +119,8 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* A single high-contrast focus treatment keeps keyboard navigation visible
+     even on the mint, coral, and dark section backgrounds. */
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,
@@ -120,18 +135,21 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
+    /* The custom cursor is strictly progressive enhancement; native cursors
+       remain intact for touch, stylus, and non-hover input modes. */
     html.custom-cursor-active,
     html.custom-cursor-active * {
       cursor: none !important;
     }
   }
 
+  /* Account for the sticky navigation when hash links move focus to a section. */
   #about,
   #projects,
   #skills,
   #experience,
   #contact {
-    scroll-margin-top: 6rem;
+    scroll-margin-top: calc(6rem + env(safe-area-inset-top, 0px));
   }
 
   #home-page-title:focus,
@@ -141,6 +159,9 @@
 }
 
 @layer components {
+  /* ------------------------------------------------------------------------
+     Loading experience
+     ------------------------------------------------------------------------ */
   .site-loader {
     position: fixed;
     inset: 0;
@@ -225,6 +246,9 @@
     transition: width 180ms var(--motion-ease);
   }
 
+  /* ------------------------------------------------------------------------
+     Shared layout and editorial typography
+     ------------------------------------------------------------------------ */
   .page-shell {
     width: 100%;
     max-width: 1360px;
@@ -233,12 +257,18 @@
     padding-right: max(1rem, env(safe-area-inset-right, 0px));
   }
 
+  .site-header {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
   .utility-label {
+    max-width: 100%;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     line-height: 1.35;
+    overflow-wrap: anywhere;
     text-transform: uppercase;
   }
 
@@ -283,6 +313,11 @@
     line-height: 1.35;
   }
 
+  /* ------------------------------------------------------------------------
+     Particle hero stage
+     The tall scroll zone is progressively enhanced only for precise pointers;
+     phones and reduced-motion users receive a single-viewport presentation.
+     ------------------------------------------------------------------------ */
   .hero-section {
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--color-accent-mint) 28%, transparent), transparent 32rem),
@@ -337,9 +372,11 @@
     z-index: 5;
     display: flex;
     width: 100%;
+    min-width: 0;
     align-items: center;
     justify-content: space-between;
-    padding-top: 0.9rem;
+    gap: 1rem;
+    padding-top: calc(0.9rem + env(safe-area-inset-top, 0px));
     color: rgb(247 241 232 / 68%);
     opacity: var(--particle-ui-opacity);
     pointer-events: none;
@@ -398,6 +435,9 @@
     min-width: 0;
   }
 
+  /* ------------------------------------------------------------------------
+     Hero content, proof card, and primary actions
+     ------------------------------------------------------------------------ */
   .hero-role-title {
     width: 100%;
     max-width: min(100%, 9ch);
@@ -588,14 +628,14 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     line-height: 1;
-    min-height: 2.7rem;
+    min-height: 2.75rem;
     padding: 0.85rem 1rem;
     text-transform: uppercase;
     text-align: center;
   }
 
   .hero-socials a {
-    width: 2.7rem;
+    width: 2.75rem;
     padding: 0;
   }
 
@@ -605,33 +645,50 @@
     color: var(--color-ink);
   }
 
-  .action-pill:hover,
   .action-pill:focus-visible,
-  .inline-link:hover,
   .inline-link:focus-visible,
-  .hero-socials a:hover,
   .hero-socials a:focus-visible,
-  .nav-desktop-link:hover,
   .nav-desktop-link:focus-visible {
     border-color: var(--color-accent-ink);
     color: var(--color-accent-ink);
     transform: translateY(-0.1rem);
   }
 
-  .action-pill--accent:hover,
   .action-pill--accent:focus-visible {
     border-color: var(--color-accent-ink);
     background: var(--color-accent-strong);
     color: var(--color-ink);
   }
 
+  /* Hover movement is capability-gated so taps do not leave controls in a
+     translated or recolored state on hybrid and touch-first devices. */
+  @media (hover: hover) and (pointer: fine) {
+    .action-pill:hover,
+    .inline-link:hover,
+    .hero-socials a:hover,
+    .nav-desktop-link:hover {
+      border-color: var(--color-accent-ink);
+      color: var(--color-accent-ink);
+      transform: translateY(-0.1rem);
+    }
+
+    .action-pill--accent:hover {
+      border-color: var(--color-accent-ink);
+      background: var(--color-accent-strong);
+      color: var(--color-ink);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Navigation controls and mobile menu affordances
+     ------------------------------------------------------------------------ */
   .nav-desktop-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.5rem;
     border: 1px solid transparent;
     border-radius: 999px;
+    min-height: 2.75rem;
     padding-inline: 1rem;
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -648,10 +705,16 @@
       transform var(--motion-standard) var(--motion-ease);
   }
 
-  .logo-mark:hover,
   .logo-mark:focus-visible {
     border-color: var(--color-accent-ink);
     transform: translateY(-0.08rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .logo-mark:hover {
+      border-color: var(--color-accent-ink);
+      transform: translateY(-0.08rem);
+    }
   }
 
   .menu-glyph {
@@ -702,6 +765,28 @@
     transform: rotate(-45deg);
   }
 
+  .nav-menu-panel {
+    max-height: calc(100dvh - 4.75rem - env(safe-area-inset-top, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    scrollbar-gutter: stable;
+  }
+
+  .nav-backdrop {
+    top: calc(4.75rem + env(safe-area-inset-top, 0px));
+  }
+
+  .nav-menu-link {
+    min-height: 3rem;
+  }
+
+  .nav-menu-link:focus-visible {
+    /* Keep the ring inside the scrollable panel instead of clipping its edge. */
+    outline-offset: 1px;
+  }
+
+  /* ------------------------------------------------------------------------
+     About summary and contact facts
+     ------------------------------------------------------------------------ */
   .info-link {
     display: grid;
     min-width: 0;
@@ -713,14 +798,12 @@
     padding: 1rem;
   }
 
-  .info-link:hover,
   .info-link:focus-visible {
     border-color: var(--color-ink);
     background: var(--color-accent-mint);
     color: var(--color-ink);
   }
 
-  .info-link:hover .text-muted,
   .info-link:focus-visible .text-muted {
     color: inherit;
   }
@@ -788,9 +871,24 @@
     overflow-wrap: anywhere;
   }
 
-  .about-contact-link:hover .about-contact-link__icon,
   .about-contact-link:focus-visible .about-contact-link__icon {
     transform: translate(0.15rem, -0.15rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .info-link:hover {
+      border-color: var(--color-ink);
+      background: var(--color-accent-mint);
+      color: var(--color-ink);
+    }
+
+    .info-link:hover .text-muted {
+      color: inherit;
+    }
+
+    .about-contact-link:hover .about-contact-link__icon {
+      transform: translate(0.15rem, -0.15rem);
+    }
   }
 
   .about-facts-grid {
@@ -815,6 +913,11 @@
     text-wrap: pretty;
   }
 
+  /* ------------------------------------------------------------------------
+     Skills marquee
+     Each track contains two identical groups; translating exactly half its
+     width creates a seamless loop without a visual reset between copies.
+     ------------------------------------------------------------------------ */
   .skills-grid {
     display: grid;
     gap: 1rem;
@@ -868,7 +971,8 @@
   .skill-marquee__viewport {
     min-width: 0;
     overflow: hidden;
-    touch-action: pan-y;
+    overscroll-behavior-inline: contain;
+    touch-action: pan-y pinch-zoom;
     mask-image: linear-gradient(
       to right,
       transparent,
@@ -910,9 +1014,17 @@
     animation-play-state: paused;
   }
 
+  .skill-marquee-row.is-visible:focus-within .skill-marquee__track {
+    animation-play-state: paused;
+  }
+
+  .skill-marquee-row:focus-visible {
+    outline: 3px solid var(--color-accent-ink);
+    outline-offset: 3px;
+  }
+
   @media (hover: hover) and (pointer: fine) {
-    .skill-marquee-row.is-visible:hover .skill-marquee__track,
-    .skill-marquee-row.is-visible:focus-within .skill-marquee__track {
+    .skill-marquee-row.is-visible:hover .skill-marquee__track {
       animation-play-state: paused;
     }
   }
@@ -981,6 +1093,11 @@
     line-height: 1.1;
   }
 
+  /* ------------------------------------------------------------------------
+     Project stack
+     Panels read as a normal document flow on compact screens and upgrade to a
+     sticky, viewport-height stack only at the guarded desktop breakpoint.
+     ------------------------------------------------------------------------ */
   .project-stack-section {
     position: relative;
   }
@@ -1168,12 +1285,12 @@
     right: clamp(0.5rem, 1vw, 0.875rem);
     z-index: 45;
     display: none;
-    width: 2.8rem;
+    width: 3rem;
     border: 1px solid rgb(255 255 255 / 8%);
     border-radius: 999px;
     background: var(--color-ink);
     box-shadow: 0 0.5rem 1.5rem rgb(17 17 17 / 14%);
-    padding: 0.45rem 0.2rem 0.5rem;
+    padding: 0.45rem 0.05rem 0.5rem;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -1206,9 +1323,9 @@
 
   .project-level-rail__number {
     display: grid;
-    width: 2.4rem;
-    min-height: 2.4rem;
-    flex: 0 0 2.4rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    flex: 0 0 2.75rem;
     place-items: center;
     border-radius: 999px;
     color: rgb(237 233 223 / 62%);
@@ -1226,14 +1343,16 @@
       transform var(--motion-standard) var(--motion-ease);
   }
 
-  .project-level-rail__number:hover {
-    background: rgb(237 233 223 / 9%);
-    color: var(--color-paper);
-  }
-
   .project-level-rail__number:focus-visible {
     outline: 3px solid var(--color-band-butter);
     outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .project-level-rail__number:hover {
+      background: rgb(237 233 223 / 9%);
+      color: var(--color-paper);
+    }
   }
 
   .project-level-rail__ladder {
@@ -1277,6 +1396,9 @@
     box-shadow: inset 0 0 0 1px rgb(237 233 223 / 24%);
   }
 
+  /* ------------------------------------------------------------------------
+     Professional journey cards
+     ------------------------------------------------------------------------ */
   .journey-grid {
     display: grid;
     gap: 1rem;
@@ -1419,6 +1541,10 @@
     }
   }
 
+  /* ------------------------------------------------------------------------
+     Contact page and form controls
+     One-rem field text deliberately prevents automatic iOS input zoom.
+     ------------------------------------------------------------------------ */
   .contact-form {
     border: 2px solid var(--color-border);
     background: var(--color-card);
@@ -1448,10 +1574,16 @@
     padding-block: 1rem;
   }
 
-  .contact-channel:hover,
   .contact-channel:focus-visible {
     color: var(--color-accent-ink);
     transform: translateX(0.2rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact-channel:hover {
+      color: var(--color-accent-ink);
+      transform: translateX(0.2rem);
+    }
   }
 
   .contact-channel__icon {
@@ -1535,11 +1667,18 @@
       transform var(--motion-standard) var(--motion-ease);
   }
 
-  .striped-action:hover,
   .striped-action:focus-visible {
     background-position: 2.3rem 0;
     box-shadow: 0.5rem 0.5rem 0 var(--color-ink);
     transform: translate(-0.1rem, -0.1rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .striped-action:hover {
+      background-position: 2.3rem 0;
+      box-shadow: 0.5rem 0.5rem 0 var(--color-ink);
+      transform: translate(-0.1rem, -0.1rem);
+    }
   }
 
   .section-index {
@@ -1565,14 +1704,22 @@
     content: "/ / / / / / / / / / / / /";
   }
 
+  /* ------------------------------------------------------------------------
+     Particle rendering and custom cursor layers
+     The DOM fallback remains beneath WebGL until the canvas reports ready.
+     ------------------------------------------------------------------------ */
   .particle-signature {
     position: relative;
     display: grid;
     width: 100%;
+    min-width: 0;
     height: clamp(9rem, 22vw, 18rem);
     place-items: center;
+    overflow: hidden;
     color: var(--color-paper);
+    contain: layout paint;
     isolation: isolate;
+    touch-action: pan-y pinch-zoom;
   }
 
   .particle-signature::before {
@@ -1683,9 +1830,13 @@
     position: relative;
     z-index: 1;
     width: 100%;
+    max-width: 100%;
+    padding-inline: clamp(0.75rem, 4vw, 3rem);
     color: var(--color-card);
     font-family: var(--font-display);
-    font-size: clamp(2.8rem, 13vw, 12.5rem);
+    /* Linear interpolation keeps the full identity fitted at 320px without a
+       visible type-size jump at an arbitrary mobile breakpoint. */
+    font-size: clamp(2rem, calc(13.75vw - 0.67rem), 12.5rem);
     font-weight: 900;
     letter-spacing: 0;
     line-height: 0.84;
@@ -1715,6 +1866,9 @@
     opacity: 1;
   }
 
+  /* ------------------------------------------------------------------------
+     Conversion CTA and portfolio footer
+     ------------------------------------------------------------------------ */
   .contact-cta-section {
     overflow: hidden;
   }
@@ -1745,11 +1899,18 @@
       transform var(--motion-standard) var(--motion-ease);
   }
 
-  .contact-cta:hover,
   .contact-cta:focus-visible {
     background-position: 4rem 0;
     box-shadow: 1.1rem 1.1rem 0 var(--color-ink);
     transform: translate(-0.15rem, -0.15rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .contact-cta:hover {
+      background-position: 4rem 0;
+      box-shadow: 1.1rem 1.1rem 0 var(--color-ink);
+      transform: translate(-0.15rem, -0.15rem);
+    }
   }
 
   .contact-cta__eyebrow {
@@ -1801,6 +1962,10 @@
     z-index: 1;
   }
 
+  .site-footer a:focus-visible {
+    outline-color: var(--color-band-butter);
+  }
+
   .site-footer__top {
     display: grid;
     gap: clamp(3.5rem, 8vw, 6rem);
@@ -1818,7 +1983,6 @@
     color: var(--color-paper);
   }
 
-  .site-footer__brand:hover,
   .site-footer__brand:focus-visible {
     color: var(--color-accent-mint);
   }
@@ -1953,14 +2117,12 @@
     color: var(--color-ink);
   }
 
-  .site-footer__contact-card:hover,
   .site-footer__contact-card:focus-visible {
     border-color: var(--color-accent-mint);
     background: var(--color-accent-mint);
     color: var(--color-ink);
   }
 
-  .site-footer__contact-card:hover .utility-label,
   .site-footer__contact-card:focus-visible .utility-label {
     color: color-mix(in srgb, var(--color-ink) 68%, transparent);
   }
@@ -2010,14 +2172,12 @@
     color: rgb(237 233 223 / 45%);
   }
 
-  .site-footer__link:hover,
   .site-footer__link:focus-visible {
     background: var(--color-accent-mint);
     color: var(--color-ink);
     padding-inline: 0.75rem;
   }
 
-  .site-footer__link:hover > :last-child,
   .site-footer__link:focus-visible > :last-child {
     color: currentColor;
   }
@@ -2051,19 +2211,50 @@
   .site-footer__back-to-top {
     display: inline-flex;
     width: fit-content;
+    min-height: 2.75rem;
     align-items: center;
     gap: 0.45rem;
+    padding-block: 0.5rem;
     color: var(--color-paper);
   }
 
-  .site-footer__back-to-top:hover,
   .site-footer__back-to-top:focus-visible {
     color: var(--color-accent-mint);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__brand:hover,
+    .site-footer__back-to-top:hover {
+      color: var(--color-accent-mint);
+    }
+
+    .site-footer__contact-card:hover {
+      border-color: var(--color-accent-mint);
+      background: var(--color-accent-mint);
+      color: var(--color-ink);
+    }
+
+    .site-footer__contact-card:hover .utility-label {
+      color: color-mix(in srgb, var(--color-ink) 68%, transparent);
+    }
+
+    .site-footer__link:hover {
+      background: var(--color-accent-mint);
+      color: var(--color-ink);
+      padding-inline: 0.75rem;
+    }
+
+    .site-footer__link:hover > :last-child {
+      color: currentColor;
+    }
   }
 
 }
 
 @layer utilities {
+  /* ------------------------------------------------------------------------
+     Motion primitives and reveal utilities
+     ------------------------------------------------------------------------ */
   @keyframes loader-screen-exit {
     from {
       opacity: 1;
@@ -2236,9 +2427,14 @@
     transition-delay: var(--meta-delay, 0ms);
   }
 
-  .interactive-lift:hover,
   .interactive-lift:focus-visible {
     transform: translateY(-0.1rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .interactive-lift:hover {
+      transform: translateY(-0.1rem);
+    }
   }
 
   .nav-menu-panel {
@@ -2263,6 +2459,11 @@
     animation-delay: var(--menu-delay, 0ms);
   }
 
+  /* ------------------------------------------------------------------------
+     Mobile-first responsive architecture
+     Base rules target the 320px floor. These additive breakpoints introduce
+     extra columns only when their content has enough usable inline space.
+     ------------------------------------------------------------------------ */
   @media (min-width: 480px) {
     .hero-actions {
       display: flex;
@@ -2272,7 +2473,6 @@
     .hero-actions .action-pill {
       width: auto;
     }
-
   }
 
   @media (min-width: 640px) {
@@ -2487,6 +2687,8 @@
     }
   }
 
+  /* Compact-screen safeguards remove sticky/reveal assumptions and reserve
+     room for rotated frames, card shadows, safe areas, and long real content. */
   @media (max-width: 1023px) {
     .project-panel[data-reveal] {
       opacity: 1;
@@ -2552,6 +2754,16 @@
   }
 
   @media (max-width: 639px) {
+    /* Width is a stronger guard than pointer capability during device emulation
+       and on hybrid hardware; one label always fits the 320px hero safely. */
+    .hero-particle-stage__meta {
+      justify-content: flex-start;
+    }
+
+    .hero-particle-stage__status {
+      display: none;
+    }
+
     .contact-submit {
       width: 100%;
     }
@@ -2563,7 +2775,7 @@
     }
 
     .hero-particle-stage__meta {
-      padding-top: 0.75rem;
+      padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
       font-size: 0.65rem;
     }
 
@@ -2651,8 +2863,13 @@
       box-shadow: 0.5rem 0.5rem 0 var(--color-ink);
     }
 
-    .contact-cta:hover,
     .contact-cta:focus-visible {
+      box-shadow: 0.7rem 0.7rem 0 var(--color-ink);
+    }
+  }
+
+  @media (max-width: 479px) and (hover: hover) and (pointer: fine) {
+    .contact-cta:hover {
       box-shadow: 0.7rem 0.7rem 0 var(--color-ink);
     }
   }
@@ -2671,6 +2888,18 @@
     .action-pill,
     .inline-link {
       padding-inline: 0.8rem;
+    }
+
+    .hero-role-title {
+      max-width: 100%;
+      font-size: clamp(2.75rem, 15vw, 3.5rem);
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    .hero-role-title span {
+      max-width: 100%;
+      white-space: nowrap;
     }
 
     .hero-proof-panel__preview-meta {
@@ -2700,6 +2929,11 @@
       width: 2.75rem;
       height: 2.75rem;
     }
+
+    .site-footer__directory {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
   }
 
   @media (max-height: 520px) and (orientation: landscape) {
@@ -2709,6 +2943,8 @@
     }
   }
 
+  /* Accessibility: retain all content and interactions while removing travel,
+     looping marquees, sticky stacks, and WebGL cross-fades when motion is reduced. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -2797,6 +3033,17 @@
       transform: none;
     }
 
+    .project-panel__visual-frame {
+      transition: none;
+    }
+
+    .particle-signature__fallback,
+    .particle-signature__canvas {
+      transition: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
     .journey-card-reveal:hover .journey-card,
     .journey-card-reveal:hover .journey-card h3 {
       transform: none;
@@ -2809,15 +3056,6 @@
 
     .journey-card-reveal:hover .journey-card::after {
       transform: translateX(-115%);
-    }
-
-    .project-panel__visual-frame {
-      transition: none;
-    }
-
-    .particle-signature__fallback,
-    .particle-signature__canvas {
-      transition: none;
     }
   }
 }

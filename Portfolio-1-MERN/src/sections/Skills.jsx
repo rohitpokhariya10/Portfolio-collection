@@ -1,4 +1,4 @@
-// Grouped skill proof presented as alternating, accessible marquee rows.
+// Data-driven skill rows retain a readable list while progressively adding marquee motion.
 import {
   Braces,
   Boxes,
@@ -72,6 +72,9 @@ const SkillIcon = ({ item }) => {
           className="skill-chip__brand-icon"
           src={iconSource}
           alt=""
+          width={25}
+          height={25}
+          loading="lazy"
           decoding="async"
           onError={(event) => {
             event.currentTarget.style.display = "none";
@@ -82,6 +85,7 @@ const SkillIcon = ({ item }) => {
   );
 };
 
+// The duplicate closes the animation seam but is hidden from assistive technology.
 const SkillPillGroup = ({ group, labelId, duplicate = false }) => (
   <ul
     className="skill-marquee__group"
@@ -92,7 +96,6 @@ const SkillPillGroup = ({ group, labelId, duplicate = false }) => (
       <li
         key={`${duplicate ? "duplicate" : "primary"}-${item}`}
         className="skill-chip"
-        tabIndex={duplicate ? -1 : 0}
       >
         <SkillIcon item={item} />
         <span className="skill-chip__label">{item}</span>
@@ -103,12 +106,18 @@ const SkillPillGroup = ({ group, labelId, duplicate = false }) => (
 
 export const Skills = () => {
   return (
-    <section id="skills" className="section-panel border-b border-border/70">
+    <section
+      id="skills"
+      className="section-panel border-b border-border/70"
+      aria-labelledby="skills-title"
+    >
       <div className="page-shell">
         <div className="section-heading-grid">
           <div data-reveal>
             <p className="utility-label text-accent-ink">Skills / grouped stack</p>
-            <h2 className="section-title mt-4">The stack behind the AI angle.</h2>
+            <h2 id="skills-title" className="section-title mt-4">
+              The stack behind the AI angle.
+            </h2>
           </div>
           <p
             className="section-copy"
@@ -120,9 +129,14 @@ export const Skills = () => {
           </p>
         </div>
 
+        <p id="skill-marquee-instructions" className="sr-only">
+          Focus a skill category to pause its scrolling list.
+        </p>
+
         <div className="skill-marquee-list mt-12" role="list">
           {skillGroups.map((group, index) => {
             const labelId = `skill-category-${index}`;
+            // Longer categories move more slowly so every label remains readable.
             const duration = Math.min(44, 34 + group.items.length * 1.5);
 
             return (
@@ -135,6 +149,9 @@ export const Skills = () => {
                 }`}
                 data-reveal
                 role="listitem"
+                tabIndex={0}
+                aria-labelledby={labelId}
+                aria-describedby="skill-marquee-instructions"
                 style={{
                   "--reveal-delay": `${index * 70}ms`,
                   "--marquee-delay": `${480 + index * 70}ms`,

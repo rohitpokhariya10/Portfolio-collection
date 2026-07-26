@@ -1,14 +1,20 @@
-// Experience, education, and achievements from the attached portfolio brief.
+// Combines chronological work history with supporting education and achievements.
 import { achievements, education, experience } from "@/data/portfolio";
 
 export const ProfessionalJourney = () => {
   return (
-    <section id="experience" className="section-panel border-b border-border/70">
+    <section
+      id="experience"
+      className="section-panel border-b border-border/70"
+      aria-labelledby="experience-title"
+    >
       <div className="page-shell">
         <div className="section-heading-grid">
           <div data-reveal>
             <p className="utility-label text-accent-ink">Experience / education</p>
-            <h2 className="section-title mt-4">Professional proof beyond projects.</h2>
+            <h2 id="experience-title" className="section-title mt-4">
+              Professional proof beyond projects.
+            </h2>
           </div>
           <p
             className="section-copy"
@@ -21,9 +27,9 @@ export const ProfessionalJourney = () => {
         </div>
 
         <div className="journey-grid mt-12">
-          <div className="grid gap-4">
+          <ol className="grid list-none gap-4 p-0" aria-label="Work experience">
             {experience.map((entry, index) => (
-              <div
+              <li
                 key={`${entry.company}-${entry.role}`}
                 className="journey-card-reveal"
                 data-reveal
@@ -41,16 +47,16 @@ export const ProfessionalJourney = () => {
                     {entry.detail}
                   </p>
                 </article>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
 
           <div
             className="journey-card-reveal"
             data-reveal
             style={{ "--reveal-delay": "160ms" }}
           >
-            <aside className="journey-card journey-card--accent">
+            <article className="journey-card journey-card--accent">
               <p className="utility-label">Education</p>
               <h3 className="mt-3 text-2xl font-black leading-tight md:text-3xl">
                 {education.degree}
@@ -63,14 +69,14 @@ export const ProfessionalJourney = () => {
               </p>
 
               <div className="mt-8 border-t border-current/30 pt-6">
-                <p className="utility-label">Achievements</p>
+                <h4 className="utility-label">Achievements</h4>
                 <ul className="mt-4 grid gap-3 text-base font-black leading-snug">
                   {achievements.map((achievement) => (
                     <li key={achievement}>{achievement}</li>
                   ))}
                 </ul>
               </div>
-            </aside>
+            </article>
           </div>
         </div>
       </div>

@@ -5,22 +5,32 @@ const MAXIMUM_CRITICAL_WAIT = 1250;
 const EXIT_DURATION = 420;
 const REDUCED_EXIT_DURATION = 140;
 
+/**
+ * Holds the application behind a short, bounded preload for assets that affect
+ * the first meaningful frame. Failures are non-blocking because every visual has
+ * a CSS or system-font fallback.
+ */
 export const LoadingScreen = ({
   preloadParticleHero = true,
   onExitStart,
   onComplete,
 }) => {
-  const totalTasks = preloadParticleHero ? 3 : 2;
+  const [reduceMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const shouldPreloadParticleHero = preloadParticleHero && !reduceMotion;
+  const totalTasks = shouldPreloadParticleHero ? 3 : 2;
   const [completedTasks, setCompletedTasks] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const onExitStartRef = useRef(onExitStart);
   const onCompleteRef = useRef(onComplete);
 
+  // Callback refs keep the preload lifecycle stable when a parent re-renders;
+  // only the latest callbacks are invoked when the asynchronous work settles.
   onExitStartRef.current = onExitStart;
   onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const exitDuration = reduceMotion ? REDUCED_EXIT_DURATION : EXIT_DURATION;
     const fontTasks = document.fonts
       ? [
@@ -31,7 +41,7 @@ export const LoadingScreen = ({
           document.fonts.load('700 1em "Space Mono"', profile.role),
         ]
       : [Promise.resolve(), Promise.resolve()];
-    const criticalTasks = preloadParticleHero
+    const criticalTasks = shouldPreloadParticleHero
       ? [...fontTasks, import("./particleTextThree")]
       : fontTasks;
     let disposed = false;
@@ -40,6 +50,8 @@ export const LoadingScreen = ({
     let safetyTimer = 0;
     let settledTasks = 0;
 
+    setCompletedTasks(0);
+    setIsExiting(false);
     document.documentElement.classList.add("site-is-loading");
 
     const startExit = () => {
@@ -73,6 +85,8 @@ export const LoadingScreen = ({
     );
 
     Promise.all(trackedTasks).then(startExit);
+    // A slow font service, dynamic import, or browser cache must never strand the
+    // user on a loading screen. Late tasks may settle during the exit animation.
     safetyTimer = window.setTimeout(startExit, MAXIMUM_CRITICAL_WAIT);
 
     return () => {
@@ -81,7 +95,7 @@ export const LoadingScreen = ({
       window.clearTimeout(safetyTimer);
       document.documentElement.classList.remove("site-is-loading");
     };
-  }, [preloadParticleHero]);
+  }, [reduceMotion, shouldPreloadParticleHero]);
 
   const progress = (completedTasks / totalTasks) * 100;
   const progressText = isExiting

@@ -1,5 +1,5 @@
-// Dedicated contact page wired to the existing Vercel/Resend endpoint.
-import { useRef, useState } from "react";
+// Owns client-side contact state and posts a normalized payload to the serverless endpoint.
+import { useState } from "react";
 import { Linkedin, LoaderCircle, Mail, Send } from "lucide-react";
 import { profile } from "@/data/portfolio";
 
@@ -21,7 +21,6 @@ const initialForm = {
 };
 
 export const Contact = () => {
-  const startedAt = useRef(Date.now());
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState("idle");
   const [feedback, setFeedback] = useState("");
@@ -59,6 +58,7 @@ export const Contact = () => {
     setFeedback("");
 
     try {
+      // Trim at the transport boundary so UI state remains faithful to what the user typed.
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -69,7 +69,6 @@ export const Contact = () => {
           email: form.email.trim(),
           phone: form.phone.trim(),
           message: form.message.trim(),
-          elapsedMs: Date.now() - startedAt.current,
         }),
       });
 
@@ -80,7 +79,6 @@ export const Contact = () => {
       }
 
       setForm(initialForm);
-      startedAt.current = Date.now();
       setStatus("success");
       setFeedback("Message sent — I'll get back to you soon.");
     } catch (error) {
@@ -90,9 +88,12 @@ export const Contact = () => {
   };
 
   return (
-    <section className="contact-page section-panel">
-      <div className="page-shell grid gap-12 lg:grid-cols-[0.42fr_0.58fr] lg:items-start lg:gap-16">
-        <div data-reveal>
+    <section
+      className="contact-page section-panel"
+      aria-labelledby="contact-page-title"
+    >
+      <div className="page-shell grid gap-12 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] lg:items-start lg:gap-16">
+        <div className="min-w-0" data-reveal>
           <p className="utility-label text-accent-ink">Contact / collaboration</p>
           <h1
             id="contact-page-title"
@@ -107,7 +108,7 @@ export const Contact = () => {
             about it.
           </p>
 
-          <div className="contact-channels mt-10">
+          <address className="contact-channels mt-10 not-italic">
             <a href={`mailto:${profile.email}`} className="contact-channel">
               <span className="contact-channel__icon" aria-hidden="true">
                 <Mail size={18} />
@@ -129,22 +130,26 @@ export const Contact = () => {
                 </span>
               </span>
             </a>
-          </div>
+          </address>
         </div>
 
         <form
-          className="contact-form relative grid gap-6"
+          className="contact-form relative grid min-w-0 gap-6"
           data-reveal="scale"
           style={{ "--reveal-delay": "120ms" }}
           onSubmit={handleSubmit}
           aria-labelledby="contact-form-title"
+          aria-describedby="contact-form-description"
           aria-busy={isSubmitting}
         >
           <header className="border-b border-border pb-5">
             <h2 id="contact-form-title" className="contact-form__title">
               Start a project
             </h2>
-            <p className="mt-2 font-semibold leading-relaxed text-muted">
+            <p
+              id="contact-form-description"
+              className="mt-2 font-semibold leading-relaxed text-muted"
+            >
               Tell me about your vision and let's make it reality
             </p>
           </header>
@@ -269,7 +274,9 @@ export const Contact = () => {
                 className={`form-feedback min-h-5 font-mono text-xs font-bold leading-snug ${
                   status === "error" ? "text-signal" : "text-ink"
                 }`}
+                role="status"
                 aria-live="polite"
+                aria-atomic="true"
               >
                 {feedback}
               </p>

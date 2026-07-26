@@ -1,4 +1,4 @@
-// Motion-forward hero led by the Full Stack AI Developer identity.
+// Progressive hero: the document stays complete while motion decorates the visual intro.
 import { useEffect, useRef } from "react";
 import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
 import { ParticleText } from "@/Components/ParticleText";
@@ -26,6 +26,8 @@ export const Hero = ({ particleActive = true }) => {
     const compactQuery = window.matchMedia("(max-width: 767px), (pointer: coarse)");
     let frameId = 0;
 
+    // CSS owns the layout; this effect only publishes scroll-derived opacity tokens.
+    // Compact and reduced-motion environments use a short fade instead of a pinned zoom.
     const updateParticleIntro = () => {
       frameId = 0;
       const isPinnedZoom = !motionQuery.matches && !compactQuery.matches;
@@ -41,10 +43,17 @@ export const Hero = ({ particleActive = true }) => {
         ? 1 - smoothstep(progress / 0.18)
         : motionOpacity;
 
-      stage.style.setProperty("--particle-motion-opacity", motionOpacity.toFixed(4));
-      stage.style.setProperty("--particle-ui-opacity", interfaceOpacity.toFixed(4));
+      stage.style.setProperty(
+        "--particle-motion-opacity",
+        motionOpacity.toFixed(4),
+      );
+      stage.style.setProperty(
+        "--particle-ui-opacity",
+        interfaceOpacity.toFixed(4),
+      );
     };
 
+    // Coalesce scroll and resize bursts into one layout read per animation frame.
     const requestIntroUpdate = () => {
       if (!frameId) {
         frameId = window.requestAnimationFrame(updateParticleIntro);
@@ -70,7 +79,10 @@ export const Hero = ({ particleActive = true }) => {
   }, []);
 
   return (
-    <section className="hero-section relative overflow-x-clip border-b border-border/70">
+    <section
+      className="hero-section relative overflow-x-clip border-b border-border/70"
+      aria-labelledby="home-page-title"
+    >
       <h1 id="home-page-title" className="sr-only" tabIndex={-1}>
         {profile.name} — {profile.role}
       </h1>
@@ -118,7 +130,11 @@ export const Hero = ({ particleActive = true }) => {
               aria-hidden="true"
             >
               <span>Scroll to portfolio</span>
-              <ArrowDown color="var(--color-signal)" size={15} strokeWidth={2.25} />
+              <ArrowDown
+                color="var(--color-signal)"
+                size={15}
+                strokeWidth={2.25}
+              />
             </div>
           </div>
         </div>
@@ -199,9 +215,9 @@ export const Hero = ({ particleActive = true }) => {
               </div>
               <div className="grid gap-3">
                 <p className="utility-label text-accent-ink">In development</p>
-                <p className="text-2xl font-black leading-none md:text-3xl">
+                <h3 className="text-2xl font-black leading-none md:text-3xl">
                   CrediFlow AI
-                </p>
+                </h3>
                 <p className="text-sm font-semibold leading-snug text-muted">
                   Automated invoice recovery for Indian MSMEs with Redis,
                   BullMQ, Socket.io, Razorpay, and AI-assisted workflows.
@@ -213,29 +229,31 @@ export const Hero = ({ particleActive = true }) => {
           <div
             className="hero-meta-grid"
             data-reveal
+            role="group"
+            aria-label="Portfolio highlights and social profiles"
             style={{ "--reveal-delay": "320ms" }}
           >
             {proofStats.map(([label, value], index) => (
-              <div
+              <dl
                 key={label}
                 className="hero-meta-item"
                 style={{ "--meta-delay": `${index * 70}ms` }}
               >
-                <p className="utility-label text-muted">{label}</p>
-                <p className="mt-2 font-display text-4xl font-black uppercase leading-none md:text-5xl">
+                <dt className="utility-label text-muted">{label}</dt>
+                <dd className="mt-2 font-display text-4xl font-black uppercase leading-none md:text-5xl">
                   {value}
-                </p>
-              </div>
+                </dd>
+              </dl>
             ))}
 
-            <div className="hero-socials">
-              <a href={profile.github} aria-label="GitHub">
+            <nav className="hero-socials" aria-label="Social profiles">
+              <a href={profile.github} aria-label="Visit GitHub profile">
                 <Github size={18} />
               </a>
-              <a href={profile.linkedin} aria-label="LinkedIn">
+              <a href={profile.linkedin} aria-label="Visit LinkedIn profile">
                 <Linkedin size={18} />
               </a>
-            </div>
+            </nav>
           </div>
         </div>
       </div>

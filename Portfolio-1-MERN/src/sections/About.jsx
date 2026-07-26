@@ -1,4 +1,4 @@
-// Professional summary and verified profile facts.
+// Keeps the profile narrative and its supporting facts in one named landmark.
 import { ArrowUpRight } from "lucide-react";
 import { contactLinks, profile } from "@/data/portfolio";
 
@@ -18,12 +18,16 @@ export const About = () => {
     <section
       id="about"
       className="about-section section-panel border-b border-border/70"
+      aria-labelledby="about-title"
     >
       <div className="page-shell">
         <div className="about-summary-grid">
           <div className="about-summary-heading" data-reveal>
             <p className="utility-label text-accent-ink">About / summary</p>
-            <h2 className="section-title about-summary-title mt-4">
+            <h2
+              id="about-title"
+              className="section-title about-summary-title mt-4"
+            >
               Product engineering from interface to infrastructure.
             </h2>
           </div>
@@ -35,7 +39,7 @@ export const About = () => {
           >
             <p className="section-copy about-summary-copy">{profile.summary}</p>
 
-            <div className="about-contact-grid">
+            <address className="about-contact-grid not-italic">
               {aboutContactLinks.map((link) => (
                 <a
                   key={link.label}
@@ -53,23 +57,23 @@ export const About = () => {
                   <span className="about-contact-link__value">{link.value}</span>
                 </a>
               ))}
-            </div>
+            </address>
           </div>
         </div>
 
-        <div className="about-facts-grid">
+        <dl className="about-facts-grid">
           {summaryFacts.map(([label, value], index) => (
-            <article
+            <div
               key={label}
               className="proof-tile about-fact"
               data-reveal
               style={{ "--reveal-delay": `${index * 70}ms` }}
             >
-              <p className="utility-label text-muted">{label}</p>
-              <p className="about-fact__value">{value}</p>
-            </article>
+              <dt className="utility-label text-muted">{label}</dt>
+              <dd className="about-fact__value">{value}</dd>
+            </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

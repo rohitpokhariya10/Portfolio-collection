@@ -1,4 +1,4 @@
-// Full-width project panels that progressively enhance into a sticky stack.
+// Full-width project records progressively enhance into a sticky, desktop-only stack.
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
@@ -9,10 +9,10 @@ const LEVEL_TICKS = 4;
 const panelTones = ["cream", "sage", "coral"];
 const clampProgress = (value) => Math.min(1, Math.max(0, value));
 
+// Starting from the non-enhanced layout keeps prerendered and hydrated markup
+// identical; the effect then opts capable viewports into desktop behavior.
 const useMediaQuery = (query) => {
-  const [matches, setMatches] = useState(
-    () => window.matchMedia(query).matches,
-  );
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(query);
@@ -40,6 +40,10 @@ const ProjectVisual = ({ project, index }) => {
           src={project.image}
           alt={`${project.title} product screenshot`}
           className="project-panel__image"
+          width={1600}
+          height={1000}
+          loading="lazy"
+          decoding="async"
         />
       ) : (
         <div className="project-panel__concept">
@@ -90,13 +94,16 @@ const ProjectPanel = ({ active, index, isStacking, project }) => {
             {project.description}
           </p>
 
-          <div className="project-panel__stack mt-6">
+          <ul
+            className="project-panel__stack mt-6"
+            aria-label={`${project.title} technology stack`}
+          >
             {project.stack.map((item) => (
-              <span key={item} className="skill-chip">
+              <li key={item} className="skill-chip">
                 {item}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
 
           <ul className="project-panel__highlights mt-6">
             {project.highlights.map((highlight) => (
@@ -137,7 +144,7 @@ const ProjectRail = ({ activeIndex, activeProgress, visible }) => {
                 href={`#${project.id}`}
                 className="project-level-rail__number"
                 aria-label={`Jump to ${project.title}`}
-                aria-current={activeIndex === index ? "step" : undefined}
+                aria-current={activeIndex === index ? "location" : undefined}
                 tabIndex={visible ? 0 : -1}
               >
                 {project.number}
@@ -168,7 +175,6 @@ const ProjectRail = ({ activeIndex, activeProgress, visible }) => {
 };
 
 export const Projects = () => {
-  const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const sentinelRefs = useRef([]);
   const reduceMotion = Boolean(useReducedMotion());
@@ -182,6 +188,8 @@ export const Projects = () => {
   const [sectionVisible, setSectionVisible] = useState(false);
 
   useEffect(() => {
+    // Sentinels remain in normal document flow while their corresponding panels
+    // become sticky, giving the rail a stable source of scroll progress.
     const sentinels = sentinelRefs.current.filter(Boolean);
     let frameId = 0;
 
@@ -245,6 +253,8 @@ export const Projects = () => {
       return undefined;
     }
 
+    // Keep the fixed rail out of both the visual and accessibility trees when
+    // the project track is outside the viewport.
     const sectionObserver = new IntersectionObserver(
       ([entry]) => setSectionVisible(entry.isIntersecting),
       { rootMargin: `-${STICKY_TOP}px 0px -10% 0px`, threshold: 0 },
@@ -258,8 +268,8 @@ export const Projects = () => {
   return (
     <section
       id="projects"
-      ref={sectionRef}
       className="section-panel project-stack-section border-b-2 border-ink"
+      aria-labelledby="projects-title"
     >
       <ProjectRail
         activeIndex={activeIndex}
@@ -271,7 +281,9 @@ export const Projects = () => {
         <div className="section-heading-grid">
           <div data-reveal>
             <p className="utility-label text-signal">Work / selected project proof</p>
-            <h2 className="section-title mt-4">CrediFlow leads the stack story.</h2>
+            <h2 id="projects-title" className="section-title mt-4">
+              CrediFlow leads the stack story.
+            </h2>
           </div>
 
           <p
@@ -294,6 +306,8 @@ export const Projects = () => {
       >
         {projects.map((project, index) => (
           <Fragment key={project.id}>
+            {/* The hash target must stay outside the sticky panel so native
+                anchor navigation lands at the panel's true document position. */}
             <span
               id={project.id}
               className="project-panel-sentinel"

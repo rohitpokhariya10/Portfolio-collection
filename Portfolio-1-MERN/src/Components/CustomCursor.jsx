@@ -12,8 +12,12 @@ const INTERACTIVE_SELECTOR = [
   "input:not(:disabled)",
   "textarea:not(:disabled)",
   "select:not(:disabled)",
+  "summary",
   "label[for]",
   '[role="button"]',
+  '[role="link"]',
+  '[contenteditable="true"]',
+  '[tabindex]:not([tabindex="-1"])',
   '[data-cursor="hover"]',
 ].join(",");
 
@@ -23,6 +27,10 @@ const ringSpring = {
   mass: 0.45,
 };
 
+/**
+ * Adds a decorative pointer only when the active device can hover precisely.
+ * Native cursor behavior remains untouched on touch and coarse-pointer devices.
+ */
 export const CustomCursor = () => {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
@@ -37,13 +45,28 @@ export const CustomCursor = () => {
 
   useEffect(() => {
     const pointerQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const syncCapability = () => setEnabled(pointerQuery.matches);
+    const syncCapability = () => {
+      const nextEnabled = pointerQuery.matches;
+
+      setEnabled(nextEnabled);
+
+      if (!nextEnabled) {
+        // Capability can change at runtime on hybrid devices. Resetting both the
+        // React and ref state prevents a stale cursor flashing when a mouse returns.
+        visibleRef.current = false;
+        hoveringRef.current = false;
+        setVisible(false);
+        setHoveringInteractive(false);
+        cursorX.set(-100);
+        cursorY.set(-100);
+      }
+    };
 
     syncCapability();
     pointerQuery.addEventListener("change", syncCapability);
 
     return () => pointerQuery.removeEventListener("change", syncCapability);
-  }, []);
+  }, [cursorX, cursorY]);
 
   useEffect(() => {
     if (!enabled) {
@@ -70,7 +93,11 @@ export const CustomCursor = () => {
       setHoveringInteractive(nextInteractive);
     };
 
-    const handleMouseMove = (event) => {
+    const handlePointerMove = (event) => {
+      if (event.pointerType === "touch") {
+        return;
+      }
+
       cursorX.set(event.clientX);
       cursorY.set(event.clientY);
       syncVisible(true);
@@ -79,21 +106,23 @@ export const CustomCursor = () => {
       syncInteractive(Boolean(target?.closest(INTERACTIVE_SELECTOR)));
     };
 
-    const handleMouseLeave = () => {
+    const hideCursor = () => {
       syncVisible(false);
       syncInteractive(false);
     };
 
     root.classList.add("custom-cursor-active");
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("blur", handleMouseLeave);
-    root.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("pointercancel", hideCursor);
+    window.addEventListener("blur", hideCursor);
+    root.addEventListener("mouseleave", hideCursor);
 
     return () => {
       root.classList.remove("custom-cursor-active");
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("blur", handleMouseLeave);
-      root.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointercancel", hideCursor);
+      window.removeEventListener("blur", hideCursor);
+      root.removeEventListener("mouseleave", hideCursor);
     };
   }, [cursorX, cursorY, enabled]);
 

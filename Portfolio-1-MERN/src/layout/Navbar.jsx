@@ -1,5 +1,3 @@
-// Sticky navigation for the editorial portfolio shell.
-// It keeps the top chrome compact so the oversized hero type can do the talking.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { profile } from "@/data/portfolio";
 
@@ -24,8 +22,12 @@ export const Navbar = ({ introGated = false }) => {
   const menuPanelRef = useRef(null);
   const pastHeroRef = useRef(!introGated);
   const revealScrollYRef = useRef(0);
+  const shouldRestoreMenuFocusRef = useRef(true);
+  const isContactPage = window.location.pathname.replace(/\/+$/, "") === "/contact";
 
   useLayoutEffect(() => {
+    // Route changes can swap the pinned home intro for a conventional page.
+    // Reset before paint so stale visibility state never flashes between routes.
     const nextPastHero = !introGated;
 
     pastHeroRef.current = nextPastHero;
@@ -44,6 +46,8 @@ export const Navbar = ({ introGated = false }) => {
       return undefined;
     }
 
+    // Keep the panel mounted for its closing animation, then make every control
+    // genuinely absent from both the DOM and the accessibility tree.
     const timeoutId = window.setTimeout(() => {
       setIsMenuRendered(false);
     }, 260);
@@ -69,15 +73,19 @@ export const Navbar = ({ introGated = false }) => {
   useEffect(() => {
     let previousScrollY = window.scrollY;
     let frameId = 0;
+    const particleScrollZone = introGated
+      ? document.querySelector("[data-hero-scroll-zone]")
+      : null;
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const compactPointerQuery = window.matchMedia(
+      "(max-width: 767px), (pointer: coarse)",
+    );
 
     const updateNavState = () => {
       const currentScrollY = Math.max(window.scrollY, 0);
       const isScrollingDown = currentScrollY > previousScrollY;
-      const particleScrollZone = introGated
-        ? document.querySelector("[data-hero-scroll-zone]")
-        : null;
-      const usesPinnedHero = !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        && !window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+      const usesPinnedHero = !reducedMotionQuery.matches
+        && !compactPointerQuery.matches;
       const thresholdOffset = usesPinnedHero ? window.innerHeight : 100;
       const heroThreshold = particleScrollZone
         ? particleScrollZone.offsetTop
@@ -128,16 +136,22 @@ export const Navbar = ({ introGated = false }) => {
         return;
       }
 
+      // Scroll can fire much faster than React should reconcile navigation state;
+      // one read and update per paint avoids layout thrashing on high-Hz devices.
       frameId = window.requestAnimationFrame(updateNavState);
     };
 
     updateNavState();
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleScroll);
+    reducedMotionQuery.addEventListener?.("change", handleScroll);
+    compactPointerQuery.addEventListener?.("change", handleScroll);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
+      reducedMotionQuery.removeEventListener?.("change", handleScroll);
+      compactPointerQuery.removeEventListener?.("change", handleScroll);
       if (frameId) {
         window.cancelAnimationFrame(frameId);
       }
@@ -149,29 +163,72 @@ export const Navbar = ({ introGated = false }) => {
       return undefined;
     }
 
+    const menuButton = menuButtonRef.current;
+    const menuPanel = menuPanelRef.current;
     const previousBodyOverflow = document.body.style.overflow;
     const previousHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
     const focusFrameId = window.requestAnimationFrame(() => {
-      menuPanelRef.current?.querySelector("a")?.focus();
+      menuPanel?.querySelector("a")?.focus();
     });
 
-    const closeOnEscape = (event) => {
+    const handleMenuKeyDown = (event) => {
       if (event.key === "Escape") {
+        event.preventDefault();
         setIsMobileMenuOpen(false);
-        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      // The expanded disclosure visually covers the page. Cycling between its
+      // trigger and links keeps keyboard focus inside the visible controls while
+      // body scrolling is locked, without claiming ARIA modal semantics.
+      const panelLinks = Array.from(
+        menuPanel?.querySelectorAll("a[href]") || [],
+      );
+      const focusableItems = [menuButton, ...panelLinks].filter(
+        (item) => item && item.getClientRects().length > 0,
+      );
+
+      if (!focusableItems.length) {
+        return;
+      }
+
+      const firstItem = focusableItems[0];
+      const lastItem = focusableItems[focusableItems.length - 1];
+      const activeElement = document.activeElement;
+
+      if (event.shiftKey && (activeElement === firstItem || !focusableItems.includes(activeElement))) {
+        event.preventDefault();
+        lastItem.focus();
+      } else if (!event.shiftKey && activeElement === lastItem) {
+        event.preventDefault();
+        firstItem.focus();
       }
     };
 
-    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("keydown", handleMenuKeyDown);
 
     return () => {
+      const focusWasInsidePanel = menuPanel?.contains(document.activeElement);
+
       window.cancelAnimationFrame(focusFrameId);
       document.body.style.overflow = previousBodyOverflow;
       document.documentElement.style.overflow = previousHtmlOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("keydown", handleMenuKeyDown);
+
+      if (
+        shouldRestoreMenuFocusRef.current
+        && focusWasInsidePanel
+        && menuButton?.getClientRects().length
+      ) {
+        menuButton.focus({ preventScroll: true });
+      }
     };
   }, [isMobileMenuOpen]);
 
@@ -180,7 +237,7 @@ export const Navbar = ({ introGated = false }) => {
 
   return (
     <header
-      className={`${introGated ? "fixed inset-x-0" : "sticky"} top-0 z-50 border-b-2 border-ink transition-[transform,opacity,background-color,box-shadow,backdrop-filter] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`site-header ${introGated ? "fixed inset-x-0" : "sticky"} top-0 z-50 border-b-2 border-ink transition-[transform,opacity,background-color,box-shadow,backdrop-filter] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
         navShouldTranslate ? "-translate-y-full" : "translate-y-0"
       } ${
         introHidden ? "pointer-events-none opacity-0" : "opacity-100"
@@ -191,8 +248,12 @@ export const Navbar = ({ introGated = false }) => {
       }`}
       aria-hidden={introHidden}
       inert={introHidden}
+      onFocusCapture={() => setIsNavHidden(false)}
     >
-      <nav className="page-shell grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-5">
+      <nav
+        className="page-shell grid min-h-16 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-5"
+        aria-label="Primary navigation"
+      >
         <a
           href="/"
           className="logo-mark h-11 w-11 overflow-hidden rounded-2xl border border-border bg-card"
@@ -211,6 +272,9 @@ export const Navbar = ({ introGated = false }) => {
               key={link.href}
               href={link.href}
               className="nav-desktop-link"
+              aria-current={
+                link.href === "/contact" && isContactPage ? "page" : undefined
+              }
             >
               {link.label}
             </a>
@@ -221,7 +285,8 @@ export const Navbar = ({ introGated = false }) => {
           href={profile.resume}
           className="action-pill hidden h-10 justify-self-end px-5 sm:inline-flex"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
+          aria-label="Résumé (opens in a new tab)"
         >
           Resume
         </a>
@@ -234,7 +299,10 @@ export const Navbar = ({ introGated = false }) => {
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-navigation"
-            onClick={() => setIsMobileMenuOpen((open) => !open)}
+            onClick={() => {
+              shouldRestoreMenuFocusRef.current = true;
+              setIsMobileMenuOpen((open) => !open);
+            }}
           >
             <span className="relative h-7 w-7 overflow-hidden rounded-full border border-current bg-card">
               <img
@@ -256,25 +324,26 @@ export const Navbar = ({ introGated = false }) => {
         </div>
       </nav>
 
-      {isMenuRendered && (
+      {(isMenuRendered || isMobileMenuOpen) && (
         <>
           <button
             type="button"
-            className={`nav-backdrop fixed inset-x-0 bottom-0 top-[4.75rem] cursor-default bg-background/70 backdrop-blur-[2px] lg:hidden ${
+            className={`nav-backdrop fixed inset-x-0 bottom-0 cursor-default bg-background/70 backdrop-blur-[2px] lg:hidden ${
               isMobileMenuOpen ? "is-open" : "is-closing"
             }`}
-            aria-label="Close navigation menu"
+            aria-hidden="true"
             tabIndex={-1}
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div
+          <nav
             ref={menuPanelRef}
             id="mobile-navigation"
-            className={`nav-menu-panel absolute left-0 top-full max-h-[calc(100dvh-4.75rem)] w-full origin-top overflow-y-auto overscroll-contain border-y border-border bg-background/95 shadow-[0_18px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden ${
+            className={`nav-menu-panel absolute left-0 top-full w-full origin-top overflow-y-auto overscroll-contain border-y border-border bg-background/95 shadow-[0_18px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden ${
               isMobileMenuOpen ? "is-open" : "is-closing"
             }`}
             aria-hidden={!isMobileMenuOpen}
             inert={!isMobileMenuOpen}
+            aria-label="Mobile navigation"
           >
             <div className="page-shell grid gap-2 py-4 sm:grid-cols-2 md:grid-cols-5">
               {navLinks.map((link, index) => (
@@ -283,13 +352,19 @@ export const Navbar = ({ introGated = false }) => {
                   href={link.href}
                   className="nav-menu-link action-pill justify-center px-4 py-3"
                   style={{ "--menu-delay": `${index * 35}ms` }}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => {
+                    shouldRestoreMenuFocusRef.current = false;
+                    setIsMobileMenuOpen(false);
+                  }}
+                  aria-current={
+                    link.href === "/contact" && isContactPage ? "page" : undefined
+                  }
                 >
                   {link.label}
                 </a>
               ))}
             </div>
-          </div>
+          </nav>
         </>
       )}
     </header>

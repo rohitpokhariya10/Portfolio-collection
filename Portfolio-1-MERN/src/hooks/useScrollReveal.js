@@ -2,32 +2,55 @@ import { useEffect } from "react";
 
 /**
  * Adds a visible class to reveal-marked elements when they enter the viewport.
- * It keeps motion declarative in the markup and respects reduced-motion users.
+ * Visibility never depends on browser observer support or a motion preference;
+ * those capabilities only decide whether the entrance is animated.
  */
 export const useScrollReveal = (dependency, enabled = true) => {
   useEffect(() => {
-    if (!enabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (!enabled) {
       return undefined;
     }
 
     const elements = Array.from(document.querySelectorAll("[data-reveal]"));
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let observer;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
+    const revealAll = () => {
+      elements.forEach((element) => element.classList.add("is-visible"));
+    };
 
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.16 }
-    );
+    const observeElements = () => {
+      observer?.disconnect();
+      observer = undefined;
 
-    elements.forEach((element) => observer.observe(element));
+      if (motionQuery.matches || !("IntersectionObserver" in window)) {
+        revealAll();
+        return;
+      }
 
-    return () => observer.disconnect();
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+
+            entry.target.classList.add("is-visible");
+            observer?.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -12% 0px", threshold: 0.16 },
+      );
+
+      elements.forEach((element) => observer.observe(element));
+    };
+
+    observeElements();
+    motionQuery.addEventListener?.("change", observeElements);
+
+    return () => {
+      motionQuery.removeEventListener?.("change", observeElements);
+      observer?.disconnect();
+    };
   }, [dependency, enabled]);
 };

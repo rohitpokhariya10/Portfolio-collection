@@ -1,4 +1,3 @@
-// Professional portfolio bookend with navigation, contact, and identity details.
 import {
   ArrowUp,
   ArrowUpRight,
@@ -47,6 +46,17 @@ const footerConnections = [
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+
+  const getCurrentPage = (href) => {
+    // Section links remain ordinary links; only canonical route links should be
+    // announced as the current page by assistive technology.
+    if ((href === "/" || href === "/contact") && href === currentPath) {
+      return "page";
+    }
+
+    return undefined;
+  };
 
   return (
     <footer className="site-footer">
@@ -109,7 +119,11 @@ export const Footer = () => {
               <ul className="site-footer__link-list">
                 {footerNavigation.map((link, index) => (
                   <li key={link.href}>
-                    <a href={link.href} className="site-footer__link">
+                    <a
+                      href={link.href}
+                      className="site-footer__link"
+                      aria-current={getCurrentPage(link.href)}
+                    >
                       <span>{link.label}</span>
                       <span aria-hidden="true">
                         {String(index + 1).padStart(2, "0")}
@@ -131,7 +145,7 @@ export const Footer = () => {
                       href={link.href}
                       className="site-footer__link"
                       target={link.external ? "_blank" : undefined}
-                      rel={link.external ? "noreferrer" : undefined}
+                      rel={link.external ? "noopener noreferrer" : undefined}
                       aria-label={
                         link.external
                           ? `${link.label} (opens in a new tab)`
@@ -148,7 +162,7 @@ export const Footer = () => {
                     href={profile.resume}
                     className="site-footer__link"
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     aria-label="Résumé (opens in a new tab)"
                   >
                     <span>Résumé</span>
