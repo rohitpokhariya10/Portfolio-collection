@@ -1,7 +1,6 @@
 import process from "node:process";
 import { Resend } from "resend";
 
-const destinationEmail = "rohit.pokhariya123@gmail.com";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const allowedProjectTypes = new Set([
   "Full-Stack Web App",
@@ -11,18 +10,24 @@ const allowedProjectTypes = new Set([
 ]);
 
 const readBody = (body) => {
-  if (typeof body !== "string") {
-    return body || {};
+  let parsedBody = body;
+
+  if (typeof parsedBody === "string") {
+    try {
+      parsedBody = JSON.parse(parsedBody);
+    } catch {
+      return null;
+    }
   }
 
-  try {
-    return JSON.parse(body);
-  } catch {
-    return {};
-  }
+  return parsedBody
+    && typeof parsedBody === "object"
+    && !Array.isArray(parsedBody)
+    ? parsedBody
+    : null;
 };
 
-const clean = (value) => String(value || "").trim();
+const clean = (value) => (typeof value === "string" ? value.trim() : "");
 const cleanSingleLine = (value) => clean(value).replace(/\s+/g, " ");
 
 /**
@@ -36,6 +41,11 @@ export default async function handler(req, res) {
   }
 
   const body = readBody(req.body);
+
+  if (!body) {
+    return res.status(400).json({ error: "Invalid request payload" });
+  }
+
   // Names are later interpolated into an email subject, so line folding is
   // removed even though Resend also validates header input.
   const firstName = cleanSingleLine(body.firstName);
@@ -74,27 +84,39 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "One or more fields are too long" });
   }
 
-  if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ error: "Email service is not configured yet" });
+  const resendApiKey = clean(process.env.RESEND_API_KEY);
+  const fromEmail = clean(process.env.RESEND_FROM_EMAIL);
+  const destinationEmail = clean(process.env.CONTACT_TO_EMAIL);
+
+  if (
+    !resendApiKey
+    || !fromEmail
+    || !destinationEmail
+    || !emailPattern.test(destinationEmail)
+  ) {
+    console.error("Contact email service configuration is incomplete or invalid");
+    return res.status(500).json({
+      error: "Unable to send your message right now. Please try again later.",
+    });
   }
 
   try {
     // Instantiate per request so serverless invocations never depend on mutable
     // module-level client state; the platform can still reuse the loaded module.
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(resendApiKey);
 
     const { error } = await resend.emails.send({
-      from:
-        process.env.RESEND_FROM_EMAIL
-        || "Portfolio Contact <onboarding@resend.dev>",
+      from: fromEmail,
       to: destinationEmail,
       replyTo: email,
-      subject: `New inquiry from ${firstName} ${lastName}`,
+      subject: `New Portfolio Contact Message — ${firstName} ${lastName}`,
       text: [
+        "New Portfolio Contact Message",
+        "",
         `Name: ${firstName} ${lastName}`,
         `Email: ${email}`,
         `Phone: ${phone || "N/A"}`,
-        `Type: ${projectType || "N/A"}`,
+        `Project type: ${projectType}`,
         "",
         "Message:",
         message,
@@ -108,6 +130,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Email send failed:", error);
-    return res.status(500).json({ error: "Failed to send message, please try again" });
+    return res.status(500).json({
+      error: "Unable to send your message right now. Please try again later.",
+    });
   }
 }
