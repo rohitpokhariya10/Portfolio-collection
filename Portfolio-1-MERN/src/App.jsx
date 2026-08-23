@@ -12,12 +12,19 @@ import { ContactCta } from "@/sections/ContactCta";
 import { Footer } from "./layout/Footer";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useLenisScroll } from "@/hooks/useLenisScroll";
+import { Privacy } from "@/sections/Privacy";
 
 const normalizePath = (pathname) =>
   pathname === "/" ? pathname : pathname.replace(/\/+$/, "");
 
-const getRoute = () =>
-  normalizePath(window.location.pathname) === "/contact" ? "contact" : "home";
+const getRoute = () => {
+  const path = normalizePath(window.location.pathname);
+
+  if (path === "/contact") return "contact";
+  if (path === "/privacy") return "privacy";
+
+  return "home";
+};
 
 const getHashTarget = (hash) => {
   if (!hash || hash === "#") {
@@ -67,14 +74,17 @@ const scrollToTarget = (target, { focus = false } = {}) => {
     return;
   }
 
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   if (focus) {
     // Intercepted hash links must reproduce native navigation for keyboard and
     // screen-reader users, not merely move the visual viewport.
-    const focusTarget = target === 0
-      ? document.querySelector("#home-page-title, #contact-page-title")
-      : getFocusTarget(target);
+    const focusTarget =
+      target === 0
+        ? document.querySelector("#home-page-title, #contact-page-title")
+        : getFocusTarget(target);
 
     if (focusTarget) {
       if (!focusTarget.hasAttribute("tabindex")) {
@@ -112,6 +122,7 @@ const App = () => {
   const [heroAnimationReady, setHeroAnimationReady] = useState(false);
   const initialHashHandledRef = useRef(false);
   const isContactRoute = route === "contact";
+  const isPrivacyRoute = route === "privacy";
 
   useLenisScroll(!isLoading);
   useScrollReveal(route, heroAnimationReady || !isLoading);
@@ -160,7 +171,9 @@ const App = () => {
   useEffect(() => {
     document.title = isContactRoute
       ? "Contact | Rohit Singh Pokhariya"
-      : "Rohit Singh Pokhariya | Full Stack AI Developer";
+      : isPrivacyRoute
+        ? "Privacy Policy | Invoice Reminder"
+        : "Rohit Singh Pokhariya | Full Stack AI Developer";
 
     if (isLoading || window.location.hash) {
       return undefined;
@@ -174,7 +187,7 @@ const App = () => {
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [isContactRoute, isLoading]);
+  }, [isContactRoute, isPrivacyRoute, isLoading]);
 
   useEffect(() => {
     const syncRoute = () => setRoute(getRoute());
@@ -195,26 +208,34 @@ const App = () => {
 
     const handleRouteClick = (event) => {
       if (
-        event.button !== 0
-        || event.metaKey
-        || event.ctrlKey
-        || event.shiftKey
-        || event.altKey
-        || !(event.target instanceof Element)
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        !(event.target instanceof Element)
       ) {
         return;
       }
 
       const anchor = event.target.closest("a[href]");
 
-      if (!anchor || event.defaultPrevented || anchor.target || anchor.hasAttribute("download")) {
+      if (
+        !anchor ||
+        event.defaultPrevented ||
+        anchor.target ||
+        anchor.hasAttribute("download")
+      ) {
         return;
       }
 
       const url = new URL(anchor.href, window.location.href);
       const normalizedPath = normalizePath(url.pathname);
 
-      if (url.origin !== window.location.origin || !["/", "/contact"].includes(normalizedPath)) {
+      if (
+        url.origin !== window.location.origin ||
+        !["/", "/contact", "/privacy"].includes(normalizedPath)
+      ) {
         return;
       }
 
@@ -274,20 +295,20 @@ const App = () => {
 
         <Navbar introGated={!isContactRoute} />
 
-        <main id="main-content" className="route-enter" key={route} tabIndex={-1}>
-          {isContactRoute ? (
-            <Contact />
-          ) : (
-            <>
-              <Hero particleActive={heroAnimationReady} />
-              <About />
-              <Skills />
-              <Projects />
-              <ProfessionalJourney />
-              <ContactCta />
-            </>
-          )}
-        </main>
+        {isContactRoute ? (
+          <Contact />
+        ) : isPrivacyRoute ? (
+          <Privacy />
+        ) : (
+          <>
+            <Hero particleActive={heroAnimationReady} />
+            <About />
+            <Skills />
+            <Projects />
+            <ProfessionalJourney />
+            <ContactCta />
+          </>
+        )}
 
         <Footer />
       </div>
