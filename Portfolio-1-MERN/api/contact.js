@@ -31,7 +31,7 @@ const clean = (value) => (typeof value === "string" ? value.trim() : "");
 const cleanSingleLine = (value) => clean(value).replace(/\s+/g, " ");
 
 /**
- * Accepts portfolio inquiries and forwards validated plain text via Resend.
+ * Accepts portfolio inquiries and forwards them through a published Resend template.
  * Every client field is treated as untrusted at this server boundary.
  */
 export default async function handler(req, res) {
@@ -46,8 +46,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid request payload" });
   }
 
-  // Names are later interpolated into an email subject, so line folding is
-  // removed even though Resend also validates header input.
+  // Keep template values that may be used in email headers on a single line.
   const firstName = cleanSingleLine(body.firstName);
   const lastName = cleanSingleLine(body.lastName);
   const email = clean(body.email);
@@ -106,21 +105,19 @@ export default async function handler(req, res) {
     const resend = new Resend(resendApiKey);
 
     const { error } = await resend.emails.send({
-      from: fromEmail,
       to: destinationEmail,
       replyTo: email,
-      subject: `New Portfolio Contact Message — ${firstName} ${lastName}`,
-      text: [
-        "New Portfolio Contact Message",
-        "",
-        `Name: ${firstName} ${lastName}`,
-        `Email: ${email}`,
-        `Phone: ${phone || "N/A"}`,
-        `Project type: ${projectType}`,
-        "",
-        "Message:",
-        message,
-      ].join("\n"),
+      template: {
+        id: "new-project-inquiry",
+        variables: {
+          FIRST_NAME: firstName,
+          LAST_NAME: lastName,
+          EMAIL: email,
+          PHONE: phone,
+          PROJECT_TYPE: projectType,
+          MESSAGE: message,
+        },
+      },
     });
 
     if (error) {
