@@ -1,6 +1,8 @@
 // Progressive hero: the document stays complete while motion decorates the visual intro.
 import { useEffect, useRef } from "react";
-import { ArrowDown, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowDown } from "lucide-react";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
+import { SiGmail, SiLeetcode } from "react-icons/si";
 import { ParticleText } from "@/Components/ParticleText";
 import { profile, proofStats } from "@/data/portfolio";
 
@@ -141,32 +143,34 @@ export const Hero = ({ particleActive = true }) => {
       </div>
 
       <div className="page-shell">
-        <div className="grid content-between gap-10 py-10 md:py-14">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.68fr)_minmax(18rem,0.32fr)] lg:items-end">
-            <div className="min-w-0">
+        <div className="grid content-between gap-8 py-8 md:py-10 lg:py-12">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.65fr)_minmax(17rem,0.35fr)] lg:items-center lg:gap-12">
+            <div className="hero-intro-copy min-w-0">
               <p className="utility-label text-accent-ink" data-reveal>
-                {profile.shortName} / {profile.role}
+                {profile.name}
               </p>
 
               <h2
-                className="hero-role-title mt-5"
+                className="hero-role-title mt-4"
                 data-reveal="line"
                 style={{ "--reveal-delay": "80ms" }}
               >
-                <span>Full Stack</span>
-                <span>AI Developer</span>
+                <span>AI Full</span>
+                <span>Stack</span>
+                <span>Developer</span>
               </h2>
 
               <p
-                className="hero-subline mt-6"
+                className="hero-subline mt-5"
                 data-reveal
                 style={{ "--reveal-delay": "160ms" }}
               >
-                {profile.subline}
+                Building production-ready SaaS across full-stack, AI/LLM,
+                real-time systems, and cloud infrastructure.
               </p>
 
               <div
-                className="hero-actions mt-8"
+                className="hero-actions mt-7"
                 data-reveal
                 style={{ "--reveal-delay": "220ms" }}
               >
@@ -174,53 +178,89 @@ export const Hero = ({ particleActive = true }) => {
                   href="#projects"
                   className="action-pill action-pill--accent"
                 >
-                  View AI work <ArrowDown size={16} />
+                  View project work <ArrowDown size={16} />
                 </a>
-                <a href="/contact" className="action-pill">
-                  Contact me <Mail size={16} />
-                </a>
+
+                <nav
+                  className="hero-profile-directory"
+                  aria-label="Professional profiles"
+                >
+
+                  <div className="hero-profile-directory__links">
+                    <a
+                      href={profile.github}
+                      className="hero-profile-directory__link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="GitHub profile (opens in a new tab)"
+                      title="GitHub"
+                    >
+                      <span className="hero-profile-directory__brand hero-profile-directory__brand--github">
+                        <FaGithub aria-hidden="true" />
+                      </span>
+                    </a>
+                    <a
+                      href={profile.linkedin}
+                      className="hero-profile-directory__link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="LinkedIn profile (opens in a new tab)"
+                      title="LinkedIn"
+                    >
+                      <span className="hero-profile-directory__brand hero-profile-directory__brand--linkedin">
+                        <FaLinkedinIn aria-hidden="true" />
+                      </span>
+                    </a>
+                    <a
+                      href={profile.leetcode}
+                      className="hero-profile-directory__link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="LeetCode profile (opens in a new tab)"
+                      title="LeetCode"
+                    >
+                      <span className="hero-profile-directory__brand hero-profile-directory__brand--leetcode">
+                        <SiLeetcode aria-hidden="true" />
+                      </span>
+                    </a>
+                    <a
+                      href={`mailto:${profile.email}`}
+                      className="hero-profile-directory__link"
+                      aria-label={`Email ${profile.name}`}
+                      title="Email"
+                    >
+                      <span className="hero-profile-directory__brand hero-profile-directory__brand--gmail">
+                        <SiGmail aria-hidden="true" />
+                      </span>
+                    </a>
+                  </div>
+                </nav>
               </div>
             </div>
 
             <aside
-              className="hero-proof-panel"
+              className="hero-proof-panel hero-profile-card"
               data-reveal="scale"
               style={{ "--reveal-delay": "260ms" }}
             >
-              <div
-                className="hero-proof-panel__coming-soon"
-                role="img"
-                aria-label="CrediFlow AI product preview coming soon"
-              >
-                <span
-                  className="hero-proof-panel__preview-label utility-label"
-                  aria-hidden="true"
-                >
-                  Product preview / 01
-                </span>
-                <strong
-                  className="hero-proof-panel__coming-soon-title"
-                  aria-hidden="true"
-                >
-                  <span>Coming</span>
-                  <span>Soon</span>
-                </strong>
-                <span
-                  className="hero-proof-panel__preview-meta utility-label"
-                  aria-hidden="true"
-                >
-                  <span>CrediFlow / AI</span>
-                  <span>In development</span>
-                </span>
+              <div className="hero-proof-panel__coming-soon hero-profile-photo-card">
+                <img
+                  src={profile.photo}
+                  alt="Rohit Singh Pokhariya - AI Full Stack Developer"
+                  className="hero-profile-photo"
+                  width="1122"
+                  height="1402"
+                  decoding="async"
+                  fetchPriority="high"
+                />
               </div>
-              <div className="grid gap-3">
-                <p className="utility-label text-accent-ink">In development</p>
-                <h3 className="text-2xl font-black leading-none md:text-3xl">
-                  CrediFlow AI
+              <div className="hero-profile-card__identity">
+                <h3 className="text-[1.35rem] font-black leading-tight md:text-[1.68rem]">
+                  {profile.name}
                 </h3>
-                <p className="text-sm font-semibold leading-snug text-muted">
-                  Automated invoice recovery for Indian MSMEs with Redis,
-                  BullMQ, Socket.io, Razorpay, and AI-assisted workflows.
+                <p className="utility-label text-accent-ink">{profile.role}</p>
+                <p className="hero-profile-card__stack text-muted">
+                  MERN • Next.js • AI/LLM • Cloud &amp; DevOps
                 </p>
               </div>
             </aside>
@@ -230,7 +270,7 @@ export const Hero = ({ particleActive = true }) => {
             className="hero-meta-grid"
             data-reveal
             role="group"
-            aria-label="Portfolio highlights and social profiles"
+            aria-label="Portfolio highlights"
             style={{ "--reveal-delay": "320ms" }}
           >
             {proofStats.map(([label, value], index) => (
@@ -240,20 +280,11 @@ export const Hero = ({ particleActive = true }) => {
                 style={{ "--meta-delay": `${index * 70}ms` }}
               >
                 <dt className="utility-label text-muted">{label}</dt>
-                <dd className="mt-2 font-display text-4xl font-black uppercase leading-none md:text-5xl">
+                <dd className="mt-2 whitespace-nowrap font-display text-[1.75rem] font-bold uppercase leading-none sm:text-[1.9rem] lg:text-[2rem]">
                   {value}
                 </dd>
               </dl>
             ))}
-
-            <nav className="hero-socials" aria-label="Social profiles">
-              <a href={profile.github} aria-label="Visit GitHub profile">
-                <Github size={18} />
-              </a>
-              <a href={profile.linkedin} aria-label="Visit LinkedIn profile">
-                <Linkedin size={18} />
-              </a>
-            </nav>
           </div>
         </div>
       </div>

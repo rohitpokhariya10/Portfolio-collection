@@ -47,18 +47,22 @@ const ProjectVisual = ({ project, index }) => {
         />
       ) : (
         <div className="project-panel__concept">
-          <p className="utility-label">System architecture</p>
-          <p className="project-panel__concept-title">AI invoice recovery</p>
+          <p className="utility-label">{project.concept.eyebrow}</p>
+          <p className="project-panel__concept-title">
+            {project.concept.title}
+          </p>
           <div className="project-panel__concept-flow" aria-hidden="true">
-            <span>Invoice</span>
-            <span>Risk</span>
-            <span>Recovery</span>
+            {project.concept.flow.map((step) => (
+              <span key={step}>{step}</span>
+            ))}
           </div>
         </div>
       )}
 
       <figcaption className="project-panel__visual-caption utility-label">
-        {project.image ? `${project.title} / product interface` : "CrediFlow AI / system scope"}
+        {project.image
+          ? `${project.title} / product interface`
+          : `${project.title} / system scope`}
       </figcaption>
     </figure>
   );
@@ -85,7 +89,7 @@ const ProjectPanel = ({ active, index, isStacking, project }) => {
           </div>
 
           <p className="utility-label mt-6">
-            {project.label} / {project.timeline}
+            {project.label}{project.timeline ? ` / ${project.timeline}` : ""}
           </p>
           <h3 id={titleId} className="project-panel__title mt-3">
             {project.title}
@@ -110,6 +114,39 @@ const ProjectPanel = ({ active, index, isStacking, project }) => {
               <li key={highlight}>{highlight}</li>
             ))}
           </ul>
+
+          {project.links?.length ? (
+            <nav
+              className="project-panel__actions"
+              aria-label={`${project.title} project links`}
+            >
+              <p className="project-panel__actions-label utility-label">
+                <span className="project-panel__actions-pulse" aria-hidden="true" />
+                Explore this project
+              </p>
+              <div className="project-panel__action-list">
+                {project.links.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className={`inline-link project-panel__action ${
+                      link.label === "Live Demo"
+                        ? "project-panel__action--primary"
+                        : "project-panel__action--secondary"
+                    }`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${link.label} for ${project.title} (opens in a new tab)`}
+                  >
+                    <span>{link.label}</span>
+                    <span className="project-panel__action-icon" aria-hidden="true">
+                      <ArrowUpRight size={18} />
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </nav>
+          ) : null}
         </div>
 
         <ProjectVisual project={project} index={index} />
@@ -282,7 +319,7 @@ export const Projects = () => {
           <div data-reveal>
             <p className="utility-label text-signal">Work / selected project proof</p>
             <h2 id="projects-title" className="section-title mt-4">
-              CrediFlow leads the stack story.
+              StudyNotion leads with production depth.
             </h2>
           </div>
 
@@ -291,9 +328,9 @@ export const Projects = () => {
             data-reveal
             style={{ "--reveal-delay": "90ms" }}
           >
-            Three production-minded builds spanning AI integration,
-            authentication, payments, queues, real-time updates, caching, and
-            resilient API design.
+            Two engineering-heavy builds spanning role-based access, real-time
+            systems, transaction integrity, payments, automated testing,
+            CI/CD, and AWS deployment.
           </p>
         </div>
       </div>

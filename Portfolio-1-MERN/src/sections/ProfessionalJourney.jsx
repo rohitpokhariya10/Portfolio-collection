@@ -21,8 +21,8 @@ export const ProfessionalJourney = () => {
             data-reveal
             style={{ "--reveal-delay": "90ms" }}
           >
-            Live teaching, project coordination, computer science fundamentals,
-            and shipped full-stack work all feed the same product-building habit.
+            Production ERP ownership at Sharnex leads the story, supported by
+            international mentoring and a Computer Science Engineering foundation.
           </p>
         </div>
 

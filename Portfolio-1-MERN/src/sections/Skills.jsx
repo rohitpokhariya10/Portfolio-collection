@@ -7,7 +7,6 @@ import {
   Cpu,
   CreditCard,
   Database,
-  Globe2,
   ImageIcon,
   KeyRound,
   MonitorSmartphone,
@@ -22,22 +21,28 @@ const devicon = (name, variant = "original") =>
 
 const skillBrandIcons = {
   "JavaScript (ES6+)": devicon("javascript"),
+  TypeScript: devicon("typescript"),
   "C++": devicon("cplusplus"),
-  Java: devicon("java"),
   HTML5: devicon("html5"),
   CSS3: devicon("css3"),
   "React.js": devicon("react"),
   "Next.js": devicon("nextjs"),
+  "Redux Toolkit": devicon("redux"),
   "Tailwind CSS": devicon("tailwindcss"),
+  SCSS: devicon("sass"),
   "Node.js": devicon("nodejs"),
   "Express.js": devicon("express"),
-  "Google OAuth 2.0": devicon("google"),
-  "MongoDB (Mongoose)": devicon("mongodb"),
+  "Socket.IO": devicon("socketio"),
+  MongoDB: devicon("mongodb"),
+  Mongoose: devicon("mongoose"),
   PostgreSQL: devicon("postgresql"),
   Redis: devicon("redis"),
+  Kubernetes: devicon("kubernetes"),
   Git: devicon("git"),
   GitHub: devicon("github"),
   Docker: devicon("docker"),
+  "Unit Testing (Jest)": devicon("jest", "plain"),
+  npm: devicon("npm", "original-wordmark"),
   Postman: devicon("postman"),
   Vercel: devicon("vercel"),
 };
@@ -45,15 +50,26 @@ const skillBrandIcons = {
 const skillFallbackIcons = {
   SQL: Database,
   "Responsive Design": MonitorSmartphone,
-  "Cross-Browser Compatibility": Globe2,
-  "REST API Design": Network,
-  "JWT Authentication": KeyRound,
-  "MVC Architecture": Boxes,
-  "Google Gemini API": Sparkles,
+  "RESTful APIs": Network,
+  JWT: KeyRound,
+  "OAuth 2.0": KeyRound,
+  WebSockets: Network,
+  "Socket.IO": Network,
+  MVC: Boxes,
+  "Microservices Architecture": Boxes,
+  "MongoDB Aggregation": Database,
+  LangChain: Sparkles,
+  "Retrieval-Augmented Generation (RAG)": Sparkles,
+  "Agentic AI": Sparkles,
+  "Multi-Agent Systems": Sparkles,
+  "Large Language Model (LLM) APIs": Sparkles,
+  "Gemini API": Sparkles,
+  AWS: Cloud,
+  "CI/CD": Workflow,
   Razorpay: CreditCard,
   Cloudinary: Cloud,
   ImageKit: ImageIcon,
-  "Data Structures & Algorithms": Workflow,
+  "Data Structures & Algorithms (DSA)": Workflow,
   DBMS: Database,
   "Operating Systems": Cpu,
   OOP: Braces,
@@ -116,7 +132,7 @@ export const Skills = () => {
           <div data-reveal>
             <p className="utility-label text-accent-ink">Skills / grouped stack</p>
             <h2 id="skills-title" className="section-title mt-4">
-              The stack behind the AI angle.
+              Full-stack depth. AI capability.
             </h2>
           </div>
           <p
@@ -124,8 +140,8 @@ export const Skills = () => {
             data-reveal
             style={{ "--reveal-delay": "90ms" }}
           >
-            Frontend, backend, data, AI integrations, and core CS fundamentals
-            organized by how they show up in production work.
+            Languages, frontend, backend, databases, AI/LLM, cloud, DevOps,
+            and core CS skills used across production work.
           </p>
         </div>
 

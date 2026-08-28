@@ -3,10 +3,10 @@ import { ArrowUpRight } from "lucide-react";
 import { contactLinks, profile } from "@/data/portfolio";
 
 const summaryFacts = [
-  ["Current build", "CrediFlow AI for Indian MSMEs"],
-  ["Shipped products", "StudyNotion + Arifex-AI"],
-  ["Teaching", "20+ students in daily live sessions"],
-  ["Availability", "Open to full-stack and software roles"],
+  ["Current work", "Construction ERP at Sharnex"],
+  ["Project proof", "StudyNotion + BidArena"],
+  ["AI / LLM", "LangChain, RAG + agentic systems"],
+  ["Delivery", "Full stack through cloud and CI/CD"],
 ];
 
 const aboutContactLinks = contactLinks.filter(({ label }) =>
@@ -28,7 +28,7 @@ export const About = () => {
               id="about-title"
               className="section-title about-summary-title mt-4"
             >
-              Product engineering from interface to infrastructure.
+              Product engineering from schema to production.
             </h2>
           </div>
 

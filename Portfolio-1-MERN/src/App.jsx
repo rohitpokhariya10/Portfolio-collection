@@ -173,7 +173,7 @@ const App = () => {
       ? "Contact | Rohit Singh Pokhariya"
       : isPrivacyRoute
         ? "Privacy Policy | Invoice Reminder"
-        : "Rohit Singh Pokhariya | Full Stack AI Developer";
+        : "Rohit Singh Pokhariya | AI Full Stack Developer";
 
     if (isLoading || window.location.hash) {
       return undefined;

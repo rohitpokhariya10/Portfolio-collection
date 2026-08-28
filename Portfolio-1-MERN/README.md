@@ -1,14 +1,14 @@
 <h1 align="center">Hi, I'm Rohit Singh Pokhariya 👋</h1>
-<h3 align="center">Full Stack AI Developer — MERN / PERN — Shipping production-grade web apps end to end</h3>
+<h3 align="center">AI Full Stack Developer — MERN / Next.js — AI/LLM — Cloud & DevOps</h3>
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&pause=1000&color=58A6FF&center=true&vCenter=true&width=650&lines=const+rohit+%3D+%7B;+++role%3A+%27Full+Stack+AI+Developer%27%2C;+++stack%3A+%5B%27React%27%2C+%27Node.js%27%2C+%27MongoDB%27%2C+%27Redis%27%5D%2C;+++building%3A+%27CrediFlow+AI%27;%7D%3B" alt="Animated introduction showing Rohit's role, stack, and current project" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=AI+Full+Stack+Developer;MERN+%7C+Next.js+%7C+AI%2FLLM+%7C+Cloud+%26+DevOps;Building+production-ready+SaaS+end+to+end" alt="Animated introduction showing Rohit's role and engineering stack" />
 </p>
 
 <p align="center">
   <a href="https://rohitpokhariya.in"><img src="https://img.shields.io/badge/Portfolio-rohitpokhariya.in-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>
-  <a href="https://www.linkedin.com/in/rohit-singh-pokhariya-24742a220/"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Connect on LinkedIn" /></a>
-  <a href="https://leetcode.com/u/user8310wm/"><img src="https://img.shields.io/badge/LeetCode-100%2B%20Solved-FFA116?style=for-the-badge&logo=leetcode&logoColor=white" alt="LeetCode: 100+ problems solved" /></a>
+  <a href="https://in.linkedin.com/in/rohit-singh-pokhariya"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Connect on LinkedIn" /></a>
+  <a href="https://leetcode.com/u/rohitpokhariya10/"><img src="https://img.shields.io/badge/LeetCode-120%2B%20Solved-FFA116?style=for-the-badge&logo=leetcode&logoColor=white" alt="LeetCode: 120+ problems solved" /></a>
   <a href="mailto:rohit.pokhariya123@gmail.com"><img src="https://img.shields.io/badge/Email-Contact-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Send an email" /></a>
 </p>
 
@@ -20,57 +20,63 @@
 
 ### 🚀 About Me
 
-- 🎓 B.Tech in Computer Science Engineering — Graphic Era Hill University, 2026
-- 🏗️ Building **CrediFlow AI** — a B2B SaaS invoice-recovery platform for Indian MSMEs, anchored in India's Section 43B(h) vendor-payment compliance rules
-- 💻 Full Stack AI Developer with 2 other production-deployed apps live in the wild (StudyNotion, Arifex-AI)
-- 📚 Freelance Coding Instructor at BrightChamps — running daily live sessions for 20+ students, Grade 1–12
-- 🧩 100+ DSA problems solved on LeetCode (arrays, trees, DP, graphs)
-- 🔭 Open to Full Stack / Software Developer roles on scalable engineering teams
+- 💻 AI Full Stack Developer shipping production SaaS features, RESTful APIs, and real-time systems across MERN and Next.js
+- 🏗️ Building a production Construction ERP at **Sharnex**, working directly with the founder; the product has secured orders from 3 clients
+- 🤖 Working with LangChain, RAG, agentic AI, multi-agent systems, LLM APIs, and Gemini API
+- ☁️ Working with Docker, Kubernetes, AWS, CI/CD, and microservices
+- 🎓 B.Tech in Computer Science Engineering — Graphic Era Hill University, Aug 2022 – Jun 2026 · CGPA: 7.2
+- 🧩 120+ DSA problems solved on LeetCode
 
 ---
 
 ### 🛠 Tech Stack
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=js,cpp,java,html,css,react,nextjs,nodejs,express,mongodb,postgres,redis,docker,tailwind,git,github,postman,vercel" alt="JavaScript, C++, Java, HTML, CSS, React, Next.js, Node.js, Express, MongoDB, PostgreSQL, Redis, Docker, Tailwind CSS, Git, GitHub, Postman, and Vercel" />
+  <img src="https://skillicons.dev/icons?i=js,ts,cpp,html,css,react,nextjs,redux,tailwind,sass,nodejs,express,mongodb,postgres,redis,docker,kubernetes,aws,git,github,jest,postman,vercel,npm" alt="JavaScript, TypeScript, C++, HTML, CSS, React, Next.js, Redux, Tailwind CSS, Sass, Node.js, Express, MongoDB, PostgreSQL, Redis, Docker, Kubernetes, AWS, Git, GitHub, Jest, Postman, Vercel, and npm" />
 </p>
 
 | Category | Stack |
 |---|---|
-| **Languages** | JavaScript (ES6+), C++, Java, SQL |
-| **Frontend** | React.js, Next.js, Tailwind CSS, Responsive/Cross-Browser UI |
-| **Backend** | Node.js, Express.js, REST APIs, JWT Auth, Google OAuth 2.0 |
-| **Data & Infra** | MongoDB (Mongoose), PostgreSQL, Redis, Docker Compose, BullMQ, Socket.io |
-| **Integrations** | Razorpay, Cloudinary, ImageKit, Google Gemini API |
-| **Tools** | Git, GitHub, Postman, VS Code, Vercel |
+| **Languages** | JavaScript (ES6+), TypeScript, C++, SQL, HTML5, CSS3 |
+| **Frontend** | React.js, Next.js, Redux Toolkit, Tailwind CSS, SCSS, Responsive Design |
+| **Backend** | Node.js, Express.js, RESTful APIs, JWT, OAuth 2.0, WebSockets, Socket.IO, MVC, Microservices |
+| **Databases** | MongoDB, Mongoose, PostgreSQL, Redis, MongoDB Aggregation |
+| **AI & LLM** | LangChain, Retrieval-Augmented Generation (RAG), Agentic AI, Multi-Agent Systems, Large Language Model (LLM) APIs, Gemini API |
+| **DevOps & Tools** | Docker, Kubernetes, AWS, CI/CD, Git, GitHub, Vercel, Unit Testing (Jest), Postman, npm |
+| **Integrations & CS** | Razorpay, ImageKit, Cloudinary, Data Structures & Algorithms (DSA), DBMS, Operating Systems, OOP, Computer Networks |
+
+---
+
+### 💼 Experience
+
+**Sharnex — AI Full Stack Developer**<br>
+Remote, India · Aug 2026 – Present
+
+Working directly with the founder on a production Construction ERP. I translate business requirements into workflows and own delivery across Next.js, Express, Prisma, database design, REST APIs, business logic, authentication, dashboards, calculations, and frontend development.
+
+**BrightChamps — Freelance Coding Instructor**<br>
+Remote, India · Apr 2026 – Present
+
+Delivering 4+ hours of live coding instruction daily to 20+ international students through project-based HTML, CSS, JavaScript, Scratch, and web development exercises.
 
 ---
 
 ### 🔥 Featured Projects
 
-**🔹 CrediFlow AI** — B2B SaaS Invoice Recovery Platform *(flagship build)*
+**StudyNotion — E-Learning Platform**
+Mar 2025 – Aug 2025
 
-Helps Indian MSMEs chase overdue vendor payments and stay compliant with Section 43B(h). Ships webhook signature verification with idempotency handling, delayed/repeatable BullMQ job scheduling, real-time Socket.io status updates, a token-gated buyer portal, and an automated risk/readiness scoring engine.
+A MERN platform with Student, Instructor, and Admin RBAC across 5+ courses. It uses 12 MongoDB models, 50 controlled indexes, and cursor-based pagination to reduce collection scans and keep high-volume catalog queries bounded, alongside Docker, AWS ECS Fargate and ECR, HTTPS, IAM, Secrets Manager, 18 automated tests, and GitHub Actions CI/CD.
 
-`Next.js` `Node.js` `MongoDB` `Redis` `BullMQ` `Socket.io` `Razorpay` `Docker`
+- Live: [AWS ECS Fargate deployment](https://st-307db269c2004a69be327bee52c92e1f.ecs.ap-south-1.on.aws/)
+- Source: [github.com/rohitpokhariya10/StudyNotion](https://github.com/rohitpokhariya10/StudyNotion)
 
-Live demo and source links coming soon.
+**BidArena — Real-Time Auction Platform**
+Jul 2026
 
-**🔹 StudyNotion** — MERN E-Learning Platform
+A server-authoritative MERN auction platform using Socket.IO, MongoDB transactions, bid queues, race-condition and duplicate-bid protection, automated timers and recovery, winner selection, live presence, chat, bid tracking, and idempotent Razorpay handling with server-side signature verification and transactional payment validation.
 
-Role-based dashboards for students and instructors across 10+ courses, Redis-cached course catalog for faster reads, Cloudinary-backed media uploads, and Razorpay webhook-driven enrollment.
-
-`React` `Node.js` `MongoDB` `Redis` `Razorpay` `Cloudinary`
-
-Live demo and source links coming soon.
-
-**🔹 Arifex-AI** — AI SaaS Platform (PERN)
-
-AI-powered text generation and resume analysis via Gemini API, Google OAuth 2.0 social login, ImageKit-optimized media delivery, and rate-limited REST APIs over PostgreSQL.
-
-`React` `Express` `PostgreSQL` `Gemini API` `Google OAuth`
-
-Live demo and source links coming soon.
+- Live: [bidarena-indol.vercel.app](https://bidarena-indol.vercel.app/)
 
 ---
 
@@ -89,7 +95,7 @@ Live demo and source links coming soon.
 ### 📫 Let's Connect
 
 <p align="center">
-  <a href="https://www.linkedin.com/in/rohit-singh-pokhariya-24742a220/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
+  <a href="https://in.linkedin.com/in/rohit-singh-pokhariya"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
   <a href="mailto:rohit.pokhariya123@gmail.com"><img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
   <a href="https://rohitpokhariya.in"><img src="https://img.shields.io/badge/Portfolio-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" /></a>
 </p>

@@ -1,30 +1,33 @@
 // Central source for real portfolio content used across the portfolio.
-// Keeping facts here prevents visual components from drifting out of sync.
+// Resume-backed facts and project links are verified against
+// /Rohit_Singh_Pokhariya_AI_FullStack_Developer_Resume.pdf.
 
 export const profile = {
   name: "Rohit Singh Pokhariya",
   shortName: "Rohit Pokhariya",
   initials: "RP",
   logo: "/logo.png",
-  role: "Full Stack AI Developer",
-  location: "India",
+  role: "AI Full Stack Developer",
+  location: "Dehradun, Uttarakhand, India",
   email: "rohit.pokhariya123@gmail.com",
   phone: "+91 90124 64329",
   website: "https://rohitpokhariya.in",
   websiteLabel: "rohitpokhariya.in",
   github: "https://github.com/rohitpokhariya10",
   githubLabel: "github.com/rohitpokhariya10",
-  linkedin: "https://www.linkedin.com/in/rohit-singh-pokhariya-24742a220/",
-  linkedinLabel: "rohit-singh-pokhariya-24742a220",
-  leetcode: "https://leetcode.com/u/user8310wm/",
-  leetcodeLabel: "100+ problems solved",
-  resume: "/Rohit_Pokhariya_CV.pdf",
-  photo: "/projects/profile-photo.jpg",
-  headline: "Full Stack AI Developer",
+  // These newer user-supplied profiles intentionally supersede the older
+  // LinkedIn and LeetCode annotations embedded in the résumé PDF.
+  linkedin: "https://in.linkedin.com/in/rohit-singh-pokhariya",
+  linkedinLabel: "rohit-singh-pokhariya",
+  leetcode: "https://leetcode.com/u/rohitpokhariya10/",
+  leetcodeLabel: "120+ problems solved",
+  resume: "/Rohit_Singh_Pokhariya_AI_FullStack_Developer_Resume.pdf",
+  photo: "/profile/rohit-singh-pokhariya-professional-headshot.png",
+  headline: "AI Full Stack Developer",
   subline:
-    "MERN / PERN developer shipping production-grade web apps end to end. Currently building CrediFlow AI, an automated invoice-recovery platform for Indian MSMEs.",
+    "Building production-ready SaaS products with React, Next.js, Node.js, Express, MongoDB/PostgreSQL, AI/LLM systems, Docker, AWS, and modern DevOps workflows.",
   summary:
-    "I build production-grade, AI-integrated web applications from React and Next.js interfaces through Node.js APIs, databases, queues, payments, and deployment. My current flagship build is CrediFlow AI, a B2B invoice-recovery platform for Indian MSMEs anchored in Section 43B(h) vendor-payment compliance.",
+    "I ship production SaaS features, RESTful APIs, and real-time systems across MERN and Next.js, from schema design and business logic to deployed UI. I also work with LangChain, Retrieval-Augmented Generation (RAG), agentic and multi-agent AI, LLM APIs, Docker, Kubernetes, AWS, CI/CD, and microservices.",
 };
 
 // Derive every channel from `profile` so cards, navigation, and contact pages
@@ -67,16 +70,17 @@ export const contactLinks = [
 export const skillGroups = [
   {
     title: "Languages",
-    items: ["JavaScript (ES6+)", "C++", "Java", "SQL", "HTML5", "CSS3"],
+    items: ["JavaScript (ES6+)", "TypeScript", "C++", "SQL", "HTML5", "CSS3"],
   },
   {
     title: "Frontend",
     items: [
       "React.js",
       "Next.js",
+      "Redux Toolkit",
       "Tailwind CSS",
+      "SCSS",
       "Responsive Design",
-      "Cross-Browser Compatibility",
     ],
   },
   {
@@ -84,28 +88,52 @@ export const skillGroups = [
     items: [
       "Node.js",
       "Express.js",
-      "REST API Design",
-      "JWT Authentication",
-      "Google OAuth 2.0",
-      "MVC Architecture",
+      "RESTful APIs",
+      "JWT",
+      "OAuth 2.0",
+      "WebSockets",
+      "Socket.IO",
+      "MVC",
+      "Microservices Architecture",
     ],
   },
   {
-    title: "Data & Caching",
-    items: ["MongoDB (Mongoose)", "PostgreSQL", "Redis"],
+    title: "Databases",
+    items: ["MongoDB", "Mongoose", "PostgreSQL", "Redis", "MongoDB Aggregation"],
   },
   {
-    title: "AI & Integrations",
-    items: ["Google Gemini API", "Razorpay", "Cloudinary", "ImageKit"],
-  },
-  {
-    title: "Tools",
-    items: ["Git", "GitHub", "Docker", "Postman", "Vercel"],
-  },
-  {
-    title: "Core CS",
+    title: "AI & LLM",
     items: [
-      "Data Structures & Algorithms",
+      "LangChain",
+      "Retrieval-Augmented Generation (RAG)",
+      "Agentic AI",
+      "Multi-Agent Systems",
+      "Large Language Model (LLM) APIs",
+      "Gemini API",
+    ],
+  },
+  {
+    title: "DevOps & Tools",
+    items: [
+      "Docker",
+      "Kubernetes",
+      "AWS",
+      "CI/CD",
+      "Git",
+      "GitHub",
+      "Vercel",
+      "Unit Testing (Jest)",
+      "Postman",
+      "npm",
+    ],
+  },
+  {
+    title: "Integrations & CS",
+    items: [
+      "Razorpay",
+      "ImageKit",
+      "Cloudinary",
+      "Data Structures & Algorithms (DSA)",
       "DBMS",
       "Operating Systems",
       "OOP",
@@ -118,123 +146,122 @@ export const skillGroups = [
 // targets for the sticky project rail, so they should not be derived from titles.
 export const projects = [
   {
-    id: "crediflow-ai",
-    number: "01",
-    title: "CrediFlow AI",
-    shortTitle: "CrediFlow",
-    label: "B2B Invoice Recovery Platform",
-    status: "Flagship AI product",
-    image: null,
-    timeline: "Current",
-    stack: [
-      "Next.js",
-      "Node.js",
-      "MongoDB",
-      "Redis",
-      "BullMQ",
-      "Socket.io",
-      "Razorpay (test mode)",
-      "Cloudinary",
-      "Docker Compose",
-    ],
-    description:
-      "A B2B SaaS platform that helps Indian MSMEs recover overdue vendor payments and stay aligned with Section 43B(h). It combines secure payment workflows, scheduled follow-ups, real-time status updates, and automated recovery-readiness scoring.",
-    highlights: [
-      "Razorpay webhook signature verification with idempotency handling",
-      "Real-time status updates through Socket.io",
-      "Token-gated buyer portal",
-      "Automated risk and recovery-readiness scoring",
-    ],
-  },
-  {
     id: "study-notion",
-    number: "02",
+    number: "01",
     title: "StudyNotion",
     shortTitle: "StudyNotion",
     label: "E-Learning Platform",
-    status: "Production full-stack app",
-    image: "/projects/study-notion.png",
-    timeline: "Mar-Aug 2025",
+    status: "Full-stack production project",
+    image: null,
+    timeline: "Mar 2025 – Aug 2025",
     stack: [
-      "React",
-      "Node.js",
-      "Express",
+      "MERN Stack",
       "MongoDB",
-      "Redis",
-      "Razorpay",
-      "Cloudinary",
+      "Docker",
+      "AWS ECS Fargate",
+      "AWS ECR",
+      "GitHub Actions",
+      "CI/CD",
+      "Automated Testing",
     ],
     description:
-      "A MERN e-learning platform with role-based student and instructor dashboards across 10+ courses, a Redis-cached course catalog, Cloudinary-backed media uploads, and Razorpay webhook-driven enrollment.",
+      "A production-oriented MERN e-learning platform with Student, Instructor, and Admin RBAC across 5+ courses, deployed securely on AWS.",
     highlights: [
-      "JWT role authentication for student/instructor dashboards",
-      "Redis caching for frequently accessed course data",
-      "Razorpay webhook verification and automated enrollment",
+      "Optimized MongoDB data access across 12 models using 50 controlled indexes and cursor-based pagination, reducing collection scans and keeping high-volume catalog queries bounded",
+      "Containerized with Docker and deployed through ECR to AWS ECS Fargate",
+      "Secured production with HTTPS, IAM, and AWS Secrets Manager",
+      "Built 18 automated tests and GitHub Actions CI/CD for authentication, course management, protected learning access, and deployment reliability",
     ],
+    links: [
+      {
+        label: "Live Demo",
+        href: "https://st-307db269c2004a69be327bee52c92e1f.ecs.ap-south-1.on.aws/",
+      },
+      {
+        label: "GitHub",
+        href: "https://github.com/rohitpokhariya10/StudyNotion",
+      },
+    ],
+    concept: {
+      eyebrow: "Deployment architecture",
+      title: "AWS-deployed e-learning platform",
+      flow: ["3-role RBAC", "ECS Fargate", "CI/CD"],
+    },
   },
   {
-    id: "arifex-ai",
-    number: "03",
-    title: "Arifex-AI",
-    shortTitle: "Arifex-AI",
-    label: "AI SaaS Platform",
-    status: "Gemini-powered SaaS",
-    image: "/projects/AI-SaaS-App.png",
-    timeline: "Sep-Dec 2024",
+    id: "bidarena",
+    number: "02",
+    title: "BidArena",
+    shortTitle: "BidArena",
+    label: "Real-Time Auction Platform",
+    status: "Real-time full-stack system",
+    image: null,
+    timeline: "Jul 2026",
     stack: [
-      "React",
-      "Node.js",
-      "Express",
-      "PostgreSQL",
-      "Gemini API",
-      "Google OAuth",
-      "ImageKit",
+      "MERN Stack",
+      "Socket.IO",
+      "MongoDB",
+      "MongoDB Transactions",
+      "Razorpay",
+      "WebSockets",
+      "Real-Time Systems",
     ],
     description:
-      "A PERN SaaS platform for AI-powered text generation and resume analysis via Gemini, with Google OAuth 2.0, ImageKit-optimized media delivery, and rate-limited REST APIs backed by PostgreSQL.",
+      "A server-authoritative real-time auction platform with live bidding, presence, chat, automated timers, recovery, winner selection, and integrated payments.",
     highlights: [
-      "AI text generation and resume analysis with Gemini API",
-      "Google OAuth 2.0 social login",
-      "Rate-limited PostgreSQL APIs with structured errors",
+      "Queues bids to preserve transaction integrity and prevent race conditions or duplicate bids",
+      "Synchronizes timers, auction recovery, winner selection, user presence, chat, and bid tracking over Socket.IO",
+      "Handles Razorpay payments idempotently with server-side signature verification and transactional validation",
+    ],
+    concept: {
+      eyebrow: "System architecture",
+      title: "Real-time auction system",
+      flow: ["Auction", "Bid queue", "Payment"],
+    },
+    links: [
+      {
+        label: "Live Demo",
+        href: "https://bidarena-indol.vercel.app/",
+      },
     ],
   },
 ];
 
 export const experience = [
   {
-    company: "BrightChamps",
-    role: "Freelance Coding Instructor",
-    date: "Apr 2026-Present",
-    location: "Remote",
+    company: "Sharnex",
+    role: "AI Full Stack Developer",
+    date: "Aug 2026 – Present",
+    location: "Remote, India",
     detail:
-      "Delivering live coding sessions to 20+ students daily across Grade 1-12, covering Scratch, HTML/CSS/JavaScript, and web development fundamentals; designing age-appropriate, project-based curricula.",
+      "Partner directly with the founder to architect a production-grade Construction ERP on Next.js, Express, and Prisma, translating business requirements into scalable workflows, REST APIs, and user-facing features. I own full-stack delivery across backend APIs, business logic, database design, authentication, dashboards, business-critical calculations, and frontend workflows built for real construction operations while shaping product and business decisions for an ERP already securing orders from 3 clients and improving usability, automation, and reliability to reduce operational effort.",
   },
   {
-    company: "PayrollCloud India Pvt Ltd",
-    role: "Project Management Intern",
-    date: "Jun-Aug 2025",
-    location: "Ahmedabad",
+    company: "BrightChamps",
+    role: "Freelance Coding Instructor",
+    date: "Apr 2026 – Present",
+    location: "Remote, India",
     detail:
-      "Coordinated planning and delivery tracking across 3 concurrent client projects, contributing to a 15% improvement in timelines. Authored 10+ process/workflow documents that reduced cross-team ambiguity.",
+      "Deliver 4+ hours of live coding instruction daily to 20+ international students across HTML, CSS, JavaScript, Scratch, and web development fundamentals. I design project-based coding curricula and hands-on exercises that translate core programming concepts into practical skills while tracking individual progress across each course.",
   },
 ];
 
 export const education = {
-  degree: "B.Tech, Computer Science Engineering",
-  school: "Graphic Era Hill University, Dehradun",
-  date: "2022-2026",
-  detail: "CGPA 7.2, graduate as of 2026.",
+  degree: "B.Tech in Computer Science Engineering",
+  school: "Graphic Era Hill University",
+  date: "Aug 2022 – Jun 2026",
+  detail: "Dehradun, Uttarakhand / CGPA: 7.2",
 };
 
 export const achievements = [
-  "100+ DSA problems solved on LeetCode.",
-  "Deployed 2 production full-stack applications with live domains.",
+  "Solved 120+ DSA problems on LeetCode across arrays, trees, graphs, and dynamic programming.",
+  "Mentor 20+ international students weekly at BrightChamps, strengthening technical communication, teaching, and problem-solving skills.",
 ];
 
 // Compact tuples keep stat labels and values paired when rendered in responsive grids.
 export const proofStats = [
-  ["AI product", "CrediFlow AI"],
-  ["Apps deployed", "2+"],
-  ["Courses shipped", "10+"],
-  ["DSA solved", "100+"],
+  ["Production work", "Construction ERP"],
+  ["Client traction", "3 orders"],
+  ["DSA solved", "120+"],
+  ["Intl. students", "50+ taught"],
 ];
